@@ -29,9 +29,11 @@ export default class Machine extends Phaser.Physics.Arcade.Sprite {
       this.body.setSize(76, 44);
       this.body.setOffset(4, 8);
     }
+    this.setWalkBounds(scene.levelData?.platforms, x, y);
+    this.snapToWalkPlatform();
 
     this.body.setCollideWorldBounds(false);
-    this.body.allowGravity = true;
+    this.applyWalkPlatformPhysics();
 
     // Health bar
     this.healthBar = scene.add.graphics().setDepth(25);
@@ -40,6 +42,41 @@ export default class Machine extends Phaser.Physics.Arcade.Sprite {
     // State machine
     this.state = 'patrol'; // patrol | chase | idle
     this.chaseRange = 320;
+  }
+
+  setWalkBounds(platforms, x, y) {
+    const platform = platforms
+      ?.filter(p => x >= p.x && x <= p.x + p.w && y <= p.y + 60)
+      .sort((a, b) => Math.abs(a.y - y) - Math.abs(b.y - y))[0];
+
+    this.walkPlatform = platform ?? null;
+
+    if (!platform) {
+      this.walkMinX = null;
+      this.walkMaxX = null;
+      return;
+    }
+
+    const margin = this.body.width / 2 + 8;
+    this.walkMinX = platform.x + margin;
+    this.walkMaxX = platform.x + platform.w - margin;
+  }
+
+  snapToWalkPlatform() {
+    if (!this.walkPlatform || !this.body) return;
+    this.y -= this.body.bottom - this.walkPlatform.y;
+    this.body.updateFromGameObject?.();
+  }
+
+  applyWalkPlatformPhysics() {
+    if (!this.body) return;
+    this.body.allowGravity = !this.walkPlatform;
+    this.snapToWalkPlatform();
+  }
+
+  canMove(dir) {
+    if (this.walkMinX === null || this.walkMaxX === null) return true;
+    return dir < 0 ? this.x > this.walkMinX : this.x < this.walkMaxX;
   }
 
   update(time, delta, playerX, playerY) {
@@ -72,7 +109,7 @@ export default class Machine extends Phaser.Physics.Arcade.Sprite {
     if (this.state === 'chase') {
       // Chase player
       const dir = dx < 0 ? -1 : 1;
-      this.setVelocityX(dir * this.speed * 1.5);
+      this.setVelocityX(this.canMove(dir) ? dir * this.speed * 1.5 : 0);
       this.setFlipX(dir > 0);
       this.play(`${this.machineType}_move`, true);
     } else {
@@ -84,6 +121,7 @@ export default class Machine extends Phaser.Physics.Arcade.Sprite {
 
       const atEdge = Math.abs(this.x - this.startX) > this.patrolRange;
       if (atEdge) this.patrolDir *= -1;
+      if (!this.canMove(this.patrolDir)) this.patrolDir *= -1;
 
       this.setVelocityX(this.patrolDir * this.speed);
       this.setFlipX(this.patrolDir > 0);

@@ -64,6 +64,7 @@ export default class GameScene extends Phaser.Scene {
       const m = new Machine(this, md.x, md.y, md.type);
       this.machines.push(m);
       this.machineGroup.add(m);
+      m.applyWalkPlatformPhysics();
     }
     this.machineCount = this.machines.length;
     this.physics.add.collider(this.machineGroup, this.platforms);
