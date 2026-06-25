@@ -146,63 +146,38 @@ export default class Machine extends Phaser.Physics.Arcade.Sprite {
   explode() {
     this.dead = true;
     this.setVelocityX(0);
-    if (this.body) this.body.setEnable(false); // stop overlap callbacks immediately
-    this.healthBar.destroy();
-    this.healthBar = null;
+    if (this.body) this.body.setEnable(false);
+    if (this.healthBar) { this.healthBar.destroy(); this.healthBar = null; }
 
-    // Big explosion - 3 bursts, each one-shot (maxParticles = quantity)
-    for (let i = 0; i < 3; i++) {
-      const px = this.x, py = this.y;
-      this.scene.time.delayedCall(i * 150, () => {
-        if (!this.scene?.add) return;
-        const blast = this.scene.add.particles(
-          px + (Math.random() - 0.5) * 50,
-          py - 15 + (Math.random() - 0.5) * 25,
-          'dust',
-          {
-            speed: { min: 60, max: 160 },
-            angle: { min: 0, max: 360 },
-            scale: { start: 1.0, end: 0 },
-            lifespan: 550,
-            quantity: 10,
-            maxParticles: 10,
-            tint: [0xFF8800, 0xFF4400, 0xFFCC00, 0x888888],
-          }
-        ).setDepth(30);
-        this.scene?.time?.delayedCall(700, () => blast?.destroy?.());
-      });
-    }
+    // Single burst particle (one-shot, safe)
+    const scene = this.scene;
+    const px = this.x, py = this.y;
+    try {
+      const blast = scene.add.particles(px, py - 15, 'dust', {
+        speed: { min: 60, max: 140 },
+        angle: { min: 0, max: 360 },
+        scale: { start: 0.9, end: 0 },
+        lifespan: 500,
+        quantity: 8,
+        maxParticles: 8,
+        tint: [0xFF8800, 0xFF4400, 0xFFCC00],
+      }).setDepth(30);
+      scene.time.delayedCall(600, () => { try { blast.destroy(); } catch (_) {} });
+    } catch (_) {}
 
-    // Shake camera
-    this.scene.cameras.main.shake(300, 0.015);
-
-    // Score text
-    const pts = this.scene.add.text(this.x, this.y - 50, '¡DESTRUIDA!', {
-      fontSize: '14px',
-      fontFamily: '"Comic Sans MS", cursive',
-      fill: '#FFFF44',
-      stroke: '#884400',
-      strokeThickness: 2,
+    // Flash + brief shake
+    scene.cameras.main.shake(200, 0.012);
+    const pts = scene.add.text(px, py - 45, '¡DESTRUIDA!', {
+      fontSize: '14px', fontFamily: '"Comic Sans MS", cursive',
+      fill: '#FFFF44', stroke: '#884400', strokeThickness: 2,
     }).setDepth(40);
-    this.scene.tweens.add({
-      targets: pts,
-      y: pts.y - 60,
-      alpha: 0,
-      duration: 1200,
-      onComplete: () => pts.destroy(),
+    scene.tweens.add({
+      targets: pts, y: pts.y - 50, alpha: 0, duration: 900,
+      onComplete: () => { try { pts.destroy(); } catch (_) {} },
     });
 
-    // Fade out and destroy
-    this.scene.tweens.add({
-      targets: this,
-      alpha: 0,
-      angle: (Math.random() - 0.5) * 90,
-      y: this.y + 20,
-      duration: 600,
-      onComplete: () => {
-        this.destroy();
-      },
-    });
+    // Destroy the machine sprite immediately (no lingering tween on `this`)
+    this.destroy();
   }
 
   updateHealthBar() {
