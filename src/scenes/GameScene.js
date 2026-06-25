@@ -163,19 +163,6 @@ export default class GameScene extends Phaser.Scene {
         .setAlpha(0.8).setScale(0.9 + Math.random() * 0.3);
     }
 
-    // Ground visual (y=400 to 450)
-    const gfx = this.add.graphics().setDepth(-1);
-    gfx.fillStyle(C.GROUND_TOP, 1);
-    gfx.fillRect(0, 400, worldW, 6);
-    gfx.fillStyle(C.GROUND, 1);
-    gfx.fillRect(0, 406, worldW, 44);
-    // grass blades
-    gfx.lineStyle(2, C.GRASS_BLADE, 0.9);
-    for (let bx = 6; bx < worldW; bx += 14) {
-      gfx.lineBetween(bx, 402, bx - 3, 394 + (bx % 4));
-      gfx.lineBetween(bx + 6, 402, bx + 9, 395 + (bx % 3));
-    }
-
     // Sun / moon
     const celestial = this.add.graphics().setScrollFactor(0.05).setDepth(-6);
     if (ld.bgIdx < 2) {
@@ -202,18 +189,17 @@ export default class GameScene extends Phaser.Scene {
     for (const pd of platData) {
       const isGround = pd.y >= 395;
 
-      if (!isGround) {
-        // Draw floating platform visual
-        gfx.fillStyle(C.GROUND_TOP, 1);
-        gfx.fillRect(pd.x, pd.y, pd.w, 5);
-        gfx.fillStyle(C.PLATFORM, 1);
-        gfx.fillRect(pd.x, pd.y + 5, pd.w, pd.h - 5);
-        // Small grass blades on top
-        gfx.lineStyle(1.5, C.GRASS_BLADE, 1);
-        for (let bx = pd.x + 5; bx < pd.x + pd.w - 3; bx += 9) {
-          gfx.lineBetween(bx, pd.y, bx - 2, pd.y - 5);
-          gfx.lineBetween(bx + 4, pd.y, bx + 6, pd.y - 4);
-        }
+      gfx.fillStyle(C.GROUND_TOP, 1);
+      gfx.fillRect(pd.x, pd.y, pd.w, 5);
+      gfx.fillStyle(isGround ? C.GROUND : C.PLATFORM, 1);
+      gfx.fillRect(pd.x, pd.y + 5, pd.w, pd.h - 5);
+
+      // Small grass blades on top
+      gfx.lineStyle(isGround ? 2 : 1.5, C.GRASS_BLADE, isGround ? 0.9 : 1);
+      const grassStep = isGround ? 14 : 9;
+      for (let bx = pd.x + 5; bx < pd.x + pd.w - 3; bx += grassStep) {
+        gfx.lineBetween(bx, pd.y, bx - 2, pd.y - 5);
+        gfx.lineBetween(bx + 4, pd.y, bx + 6, pd.y - 4);
       }
 
       // Physics: one static zone per platform
