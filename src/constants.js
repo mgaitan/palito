@@ -115,8 +115,10 @@ export const LEVELS = [
       { x: 2860, y: 380, w: 340,  h: 20 },
     ],
     machines: [
+      { type: 'bulldozer', x: 940,  y: 340 },
       { type: 'excavator', x: 1280, y: 370 },
       { type: 'bulldozer', x: 1700, y: 360 },
+      { type: 'excavator', x: 1980, y: 330 },
       { type: 'excavator', x: 2320, y: 370 },
     ],
     plants: [

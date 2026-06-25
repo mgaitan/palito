@@ -433,25 +433,35 @@ export function makeAnimals(scene) {
     gr.destroy();
   }
 
-  // Bird 24×18
+  // Bird 32×22
   for (const pose of ['fly1', 'fly2']) {
     const gr = g(scene);
-    gr.fillStyle(0xFF6B35, 1);
-    gr.fillEllipse(12, 10, 16, 10);
-    gr.fillStyle(0x222222, 1);
-    gr.fillEllipse(20, 8, 8, 7);
-    gr.fillStyle(0xFFCC00, 1);
-    gr.fillTriangle(22, 8, 26, 7, 22, 10);
-    gr.fillStyle(C.EYE, 1);
-    gr.fillCircle(21, 7, 1.5);
-    // Wings
-    gr.fillStyle(0xFF8C55, 1);
+
+    // Wing behind the body, with a smaller flap so it reads as a bird.
+    gr.fillStyle(0xD76A3D, 1);
     if (pose === 'fly1') {
-      gr.fillEllipse(12, 4, 20, 8);
+      gr.fillTriangle(14, 11, 4, 2, 21, 7);
     } else {
-      gr.fillEllipse(12, 14, 20, 8);
+      gr.fillTriangle(14, 11, 5, 18, 22, 15);
     }
-    gr.generateTexture(`bird_${pose}`, 28, 18);
+
+    // Tail
+    gr.fillStyle(0xA8482C, 1);
+    gr.fillTriangle(7, 11, 1, 7, 1, 15);
+
+    // Body and head
+    gr.fillStyle(0xFF8A4C, 1);
+    gr.fillEllipse(15, 12, 17, 11);
+    gr.fillStyle(0xF06F3C, 1);
+    gr.fillEllipse(24, 10, 9, 8);
+
+    // Beak and eye
+    gr.fillStyle(0xFFCC00, 1);
+    gr.fillTriangle(28, 10, 32, 8, 28, 12);
+    gr.fillStyle(C.EYE, 1);
+    gr.fillCircle(25, 9, 1.3);
+
+    gr.generateTexture(`bird_${pose}`, 34, 22);
     gr.destroy();
   }
 

@@ -51,6 +51,12 @@ make build     # Genera el build de producción en dist/
 make preview   # Previsualiza el build de producción localmente
 ```
 
+Para abrir directo un nivel desde el servidor de desarrollo:
+
+```bash
+npm run dev -- --level 2   # opciones: 1, 2 o 3; default: 1
+```
+
 ---
 
 ## 🌐 Deploy en Cloudflare Pages

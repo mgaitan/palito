@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "El Monte de Palito - Videojuego sobre el desmonte del monte cordobés",
   "scripts": {
-    "dev": "vite --open",
+    "dev": "node scripts/dev.mjs",
     "build": "vite build",
     "preview": "vite preview"
   },

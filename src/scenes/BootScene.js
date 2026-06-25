@@ -34,7 +34,21 @@ export default class BootScene extends Phaser.Scene {
     this.registerAnimations();
 
     text.destroy();
+    const requestedLevel = this.getRequestedLevel();
+    if (requestedLevel !== null) {
+      this.scene.start('GameScene', { level: requestedLevel });
+      return;
+    }
+
     this.scene.start('MenuScene');
+  }
+
+  getRequestedLevel() {
+    const rawLevel = new URLSearchParams(window.location.search).get('level');
+    if (rawLevel === null) return null;
+
+    const level = Number.parseInt(rawLevel, 10);
+    return level >= 1 && level <= 3 ? level - 1 : 0;
   }
 
   registerAnimations() {
