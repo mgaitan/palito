@@ -146,7 +146,9 @@ export default class Machine extends Phaser.Physics.Arcade.Sprite {
   explode() {
     this.dead = true;
     this.setVelocityX(0);
+    if (this.body) this.body.setEnable(false); // stop overlap callbacks immediately
     this.healthBar.destroy();
+    this.healthBar = null;
 
     // Big explosion - 3 bursts, each one-shot (maxParticles = quantity)
     for (let i = 0; i < 3; i++) {
@@ -204,6 +206,7 @@ export default class Machine extends Phaser.Physics.Arcade.Sprite {
   }
 
   updateHealthBar() {
+    if (!this.healthBar) return;
     this.healthBar.clear();
     if (this.dead) return;
 

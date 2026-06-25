@@ -388,6 +388,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   onMachineTouchPlayer(player, machineSprite) {
+    if (!machineSprite.active) return;
     const machine = this.machines.find(m => m === machineSprite);
     if (!machine || machine.dead) return;
     this.palito.takeDamage();
