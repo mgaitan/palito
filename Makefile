@@ -1,4 +1,9 @@
-.PHONY: dev build preview install
+ifneq (,$(wildcard .env))
+include .env
+export
+endif
+
+.PHONY: dev build preview install deploy
 
 install:
 	npm install
@@ -11,3 +16,6 @@ build: install
 
 preview: build
 	npm run preview
+
+deploy: build
+	npx wrangler pages deploy dist --project-name palito
