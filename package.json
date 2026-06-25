@@ -1,0 +1,16 @@
+{
+  "name": "monte-palito",
+  "version": "1.0.0",
+  "description": "El Monte de Palito - Videojuego sobre el desmonte del monte cordobés",
+  "scripts": {
+    "dev": "vite --open",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "phaser": "^3.80.1"
+  },
+  "devDependencies": {
+    "vite": "^5.4.0"
+  }
+}
