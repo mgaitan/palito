@@ -17,6 +17,8 @@ export default class Machine extends Phaser.Physics.Arcade.Sprite {
     this.patrolTimer = 0;
     this.patrolRange = 180 + Math.random() * 120;
     this.startX = x;
+    this.edgeWaitTimer = 0;
+    this.chaseCooldown = 0;
 
     this.setDepth(15);
     this.setScale(1.0);
@@ -99,8 +101,10 @@ export default class Machine extends Phaser.Physics.Arcade.Sprite {
       return;
     }
 
+    this.chaseCooldown = Math.max(0, this.chaseCooldown - delta);
+
     // State transitions
-    if (dist < this.chaseRange) {
+    if (dist < this.chaseRange && this.chaseCooldown <= 0) {
       this.state = 'chase';
     } else if (dist > this.chaseRange + 100) {
       this.state = 'patrol';
@@ -109,10 +113,28 @@ export default class Machine extends Phaser.Physics.Arcade.Sprite {
     if (this.state === 'chase') {
       // Chase player
       const dir = dx < 0 ? -1 : 1;
-      this.setVelocityX(this.canMove(dir) ? dir * this.speed * 1.5 : 0);
+      const canChase = this.canMove(dir);
+
+      if (canChase) {
+        this.edgeWaitTimer = 0;
+        this.setVelocityX(dir * this.speed * 1.5);
+      } else {
+        this.edgeWaitTimer += delta;
+        this.setVelocityX(0);
+
+        if (this.edgeWaitTimer > 850) {
+          this.state = 'patrol';
+          this.patrolDir = -dir;
+          this.patrolTimer = 1200;
+          this.chaseCooldown = 1500;
+          this.edgeWaitTimer = 0;
+        }
+      }
+
       this.setFlipX(dir > 0);
-      this.play(`${this.machineType}_move`, true);
+      this.play(canChase ? `${this.machineType}_move` : `${this.machineType}_idle`, true);
     } else {
+      this.edgeWaitTimer = 0;
       // Patrol back and forth
       if (this.patrolTimer <= 0) {
         this.patrolDir *= -1;
