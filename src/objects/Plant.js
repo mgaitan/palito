@@ -74,13 +74,14 @@ export default class Plant extends Phaser.GameObjects.Sprite {
       this.state = 'regrowing';
       this.setTexture(`${this.plantType}_full`);
       this.setAlpha(0);
+      const targetScaleY = this.scaleY;
       this.scene.tweens.add({
         targets: this,
         alpha: 1,
-        scaleY: this.scaleY,
+        scaleY: targetScaleY,
         duration: 1200,
         ease: 'Back.easeOut',
-        onStart: () => this.setScaleY(0),
+        onStart: () => this.setScale(this.scaleX, 0),
         onComplete: () => {
           this.state = 'full';
           this.clearTint();
