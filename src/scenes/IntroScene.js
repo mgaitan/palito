@@ -4,13 +4,14 @@ const PAGES = [
   {
     text: [
       'Hace mucho tiempo, el monte cordobés',
-      'era un bosque lleno de vida...',
+      'paravachasca era un monte lleno de vida...',
       '',
       'Quebrachos, algarrobos, jarillas y cactus',
       'daban hogar a zorros, vizcachas, pájaros',
       'y lagartijas.',
     ],
-    emoji: '🌿',
+    icon: 'quebracho_full',
+    iconScale: 1.15,
   },
   {
     text: [
@@ -22,7 +23,8 @@ const PAGES = [
       '',
       'El monte empezó a desaparecer...',
     ],
-    emoji: '😢',
+    icon: 'excavator_idle',
+    iconScale: 0.9,
   },
   {
     text: [
@@ -34,19 +36,21 @@ const PAGES = [
       'Con su palo, destruye las máquinas',
       'y deja que la naturaleza vuelva a crecer.',
     ],
-    emoji: '🦸',
+    icon: 'palito_idle',
+    iconScale: 1.8,
   },
   {
     text: [
       'Tu misión:',
       '',
-      '  ⬅ ➡  → moverse',
-      '  ↑  o  ESPACIO → saltar',
-      '  Z  → atacar con el palo',
+      '  Flechas: moverse',
+      '  Arriba o ESPACIO: saltar',
+      '  Z: atacar con el palo',
       '',
       '¡Llega a la cumbre y encontrá la semilla!',
     ],
-    emoji: '🌱',
+    icon: 'seed',
+    iconScale: 1.8,
   },
 ];
 
@@ -83,15 +87,15 @@ export default class IntroScene extends Phaser.Scene {
       );
     }
 
-    // Emoji display
-    this.emojiText = this.add.text(GW / 2, 85, '', {
-      fontSize: '44px',
-    }).setOrigin(0.5);
+    // Story picture
+    this.storyIcon = this.add.sprite(GW / 2, 92, 'palito_idle')
+      .setOrigin(0.5)
+      .setDepth(2);
 
     // Main text
     this.mainText = this.add.text(GW / 2, 180, '', {
       fontSize: '15px',
-      fontFamily: "'Fredoka One', 'Comic Sans MS', cursive",
+      fontFamily: "'Fredoka', 'Comic Sans MS', cursive",
       fill: '#CCFF99',
       align: 'center',
       lineSpacing: 8,
@@ -101,7 +105,7 @@ export default class IntroScene extends Phaser.Scene {
     // Page indicator
     this.pageText = this.add.text(GW / 2, GH - 80, '', {
       fontSize: '11px',
-      fontFamily: "'Fredoka', 'Courier New', monospace",
+      fontFamily: "'Fredoka', 'Comic Sans MS', cursive",
       fill: '#558833',
     }).setOrigin(0.5);
 
@@ -116,7 +120,7 @@ export default class IntroScene extends Phaser.Scene {
     // Skip button
     const skipText = this.add.text(GW - 80, GH - 58, 'Saltar »', {
       fontSize: '13px',
-      fontFamily: "'Fredoka', 'Courier New', monospace",
+      fontFamily: "'Fredoka', 'Comic Sans MS', cursive",
       fill: '#446622',
     }).setOrigin(0.5).setInteractive();
     skipText.on('pointerover', () => skipText.setFill('#88CC44'));
@@ -140,14 +144,17 @@ export default class IntroScene extends Phaser.Scene {
     const label = this.page < PAGES.length - 1 ? 'Siguiente ▶' : '¡A jugar! ▶';
     this.nextLabel = this.add.text(GW / 2, GH - 54, label, {
       fontSize: '15px',
-      fontFamily: "'Fredoka One', 'Comic Sans MS', cursive",
+      fontFamily: "'Bangers', 'Fredoka', 'Comic Sans MS', cursive",
       fill: '#FFFFFF',
     }).setOrigin(0.5);
   }
 
   showPage(idx) {
     const pg = PAGES[idx];
-    this.emojiText.setText(pg.emoji);
+    this.storyIcon
+      .setTexture(pg.icon)
+      .setScale(pg.iconScale ?? 1)
+      .setFlipX(false);
     this.mainText.setText('');
     this.charIdx = 0;
     this.displayedText = '';
@@ -172,11 +179,10 @@ export default class IntroScene extends Phaser.Scene {
       loop: true,
     });
 
-    // Emoji bounce
     this.tweens.add({
-      targets: this.emojiText,
-      scaleX: 1.2,
-      scaleY: 1.2,
+      targets: this.storyIcon,
+      scaleX: (pg.iconScale ?? 1) * 1.12,
+      scaleY: (pg.iconScale ?? 1) * 1.12,
       duration: 400,
       yoyo: true,
       ease: 'Bounce.easeOut',

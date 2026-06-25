@@ -1,4 +1,5 @@
 import { GW, GH } from '../constants.js';
+import { spawnSpriteBurst } from '../effects.js';
 
 const CREDITS = [
   { label: 'Un juego de:', value: 'Grupo 4 · 5ºB' },
@@ -56,16 +57,21 @@ export default class WinScene extends Phaser.Scene {
     this.treeGfx = this.add.graphics().setDepth(10);
     this.drawGreatTree(0);
 
-    // Particles around tree
-    this.treeParticles = this.add.particles(GW / 2, GH - 100, 'star', {
-      speed: { min: 30, max: 100 },
-      angle: { min: -150, max: -30 },
-      scale: { start: 1, end: 0 },
-      lifespan: 1200,
-      quantity: 2,
-      frequency: 150,
-      tint: [0x88FF44, 0xFFFF44, 0x44FF88, 0xFFEE88],
-    }).setDepth(15);
+    this.treeSparkles = this.time.addEvent({
+      delay: 150,
+      callback: () => spawnSpriteBurst(this, GW / 2, GH - 100, 'star', {
+        count: 2,
+        speed: 80,
+        duration: 1200,
+        depth: 15,
+        angleMin: -150,
+        angleMax: -30,
+        scaleMin: 0.45,
+        scaleMax: 1,
+        tints: [0x88FF44, 0xFFFF44, 0x44FF88, 0xFFEE88],
+      }),
+      loop: true,
+    });
 
     // Condor flying!
     this.condor = this.add.sprite(100, 80, 'condor_glide1').setDepth(20).setScale(1.5);
@@ -222,17 +228,17 @@ export default class WinScene extends Phaser.Scene {
     // Shake camera
     this.cameras.main.shake(200, 0.008);
 
-    // Burst particles
-    const burst = this.add.particles(GW / 2, GH - 200, 'star', {
-      speed: { min: 60, max: 180 },
-      angle: { min: -180, max: 0 },
-      scale: { start: 1.0, end: 0 },
-      lifespan: 700,
-      quantity: 10,
-      maxParticles: 10,
-      tint: [0x88FF44, 0xFFFF44, 0xFFEE00],
-    }).setDepth(20);
-    this.time.delayedCall(900, () => burst?.destroy?.());
+    spawnSpriteBurst(this, GW / 2, GH - 200, 'star', {
+      count: 10,
+      speed: 160,
+      duration: 700,
+      depth: 20,
+      angleMin: -180,
+      angleMax: 0,
+      scaleMin: 0.55,
+      scaleMax: 1,
+      tints: [0x88FF44, 0xFFFF44, 0xFFEE00],
+    });
   }
 
   spawnAnimals() {

@@ -3,9 +3,10 @@ import Palito from '../objects/Palito.js';
 import Machine from '../objects/Machine.js';
 import Plant from '../objects/Plant.js';
 import Animal from '../objects/Animal.js';
+import { spawnSpriteBurst } from '../effects.js';
 
-const FONT = "'Fredoka One', 'Comic Sans MS', cursive";
-const FONT_BODY = "'Fredoka', 'Courier New', monospace";
+const FONT = "'Bangers', 'Fredoka', 'Comic Sans MS', cursive";
+const FONT_BODY = "'Fredoka', 'Comic Sans MS', cursive";
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -233,7 +234,7 @@ export default class GameScene extends Phaser.Scene {
     this.updateMachineCounter();
 
     if (this.levelData.seedX !== undefined) {
-      this.add.text(GW / 2, GH - 28, '🌱 ¡Buscá la semilla en la cumbre!', {
+      this.add.text(GW / 2, GH - 28, 'Semilla: buscala en la cumbre', {
         fontSize: '13px', fontFamily: FONT,
         fill: '#FFFF88', stroke: '#1A3A0A', strokeThickness: 2,
       }).setOrigin(0.5, 1).setScrollFactor(0).setDepth(50);
@@ -248,8 +249,12 @@ export default class GameScene extends Phaser.Scene {
   }
 
   updateMachineCounter() {
-    const remaining = this.machines.filter(m => !m.dead).length;
-    this.machineCounterText?.setText(`🔧 ${remaining}/${this.machineCount}`);
+    const remaining = this.machines.filter(m => this.isMachineAlive(m)).length;
+    this.machineCounterText?.setText(`Maquinas ${remaining}/${this.machineCount}`);
+  }
+
+  isMachineAlive(machine) {
+    return Boolean(machine?.active && machine.scene && !machine.dead);
   }
 
   // ── Level banner ───────────────────────────────────────────────────────────
@@ -357,17 +362,18 @@ export default class GameScene extends Phaser.Scene {
   // ── Overlap handlers ───────────────────────────────────────────────────────
   onAttackHit(hitbox, machineSprite) {
     const machine = this.machines.find(m => m === machineSprite);
-    if (!machine || machine.dead || machine.stunned) return;
+    if (!this.isMachineAlive(machine) || machine.stunned) return;
 
     const destroyed = machine.hit(1);
     this.updateMachineCounter();
 
     if (destroyed) {
+      this.machineGroup.remove(machine, false, false);
       this.machinesDefeated++;
       this.regrowNearbyPlants(machine.x);
       this.returnNearbyAnimals(machine.x);
 
-      const remaining = this.machines.filter(m => !m.dead).length;
+      const remaining = this.machines.filter(m => this.isMachineAlive(m)).length;
       if (remaining === 0 && !this.levelComplete) {
         this.time.delayedCall(1800, () => this.completeLevelOrSeed());
       }
@@ -375,9 +381,8 @@ export default class GameScene extends Phaser.Scene {
   }
 
   onMachineTouchPlayer(player, machineSprite) {
-    if (!machineSprite.active) return;
     const machine = this.machines.find(m => m === machineSprite);
-    if (!machine || machine.dead) return;
+    if (!this.isMachineAlive(machine)) return;
     this.palito.takeDamage();
     this.updateHUDHearts();
   }
@@ -385,7 +390,7 @@ export default class GameScene extends Phaser.Scene {
   // ── Plant / animal effects after machine dies ──────────────────────────────
   checkMachinePlantDamage() {
     for (const machine of this.machines) {
-      if (machine.dead) continue;
+      if (!this.isMachineAlive(machine)) continue;
       for (const plant of this.plants) {
         const dx = Math.abs(plant.x - machine.x);
         if (dx < 100 && plant.state === 'full') plant.wither();
@@ -396,7 +401,7 @@ export default class GameScene extends Phaser.Scene {
 
   checkMachineAnimalScare() {
     for (const machine of this.machines) {
-      if (machine.dead) continue;
+      if (!this.isMachineAlive(machine)) continue;
       for (const animal of this.animals) {
         if (Math.abs(animal.x - machine.x) < 150) animal.scare();
       }
@@ -425,7 +430,7 @@ export default class GameScene extends Phaser.Scene {
   completeLevelOrSeed() {
     if (this.levelComplete) return;
     if (this.levelData.seedX !== undefined && !this.seedCollected) {
-      this.showMessage('¡Máquinas destruidas!\n🌱 ¡Buscá la semilla en la cumbre!', 3000);
+      this.showMessage('¡Máquinas destruidas!\nBuscá la semilla en la cumbre.', 3000);
       return;
     }
     this.levelComplete = true;
@@ -452,24 +457,21 @@ export default class GameScene extends Phaser.Scene {
   }
 
   showLevelCompleteScreen() {
-    // Celebrate! (maxParticles = quantity for one-shot bursts)
     for (let i = 0; i < 4; i++) {
       this.time.delayedCall(i * 220, () => {
         if (!this.scene?.add) return;
-        const confetti = this.add.particles(
-          GW / 2 + (Math.random() - 0.5) * 300, GH / 2,
-          'star',
-          {
-            speed: { min: 100, max: 300 },
-            angle: { min: -180, max: 0 },
-            scale: { start: 1.2, end: 0 },
-            lifespan: 800,
-            quantity: 10,
-            maxParticles: 10,
-            tint: [0xFFFF44, 0x88FF44, 0xFF8844, 0x44FFFF],
-          }
-        ).setScrollFactor(0).setDepth(80);
-        this.time.delayedCall(1000, () => confetti?.destroy?.());
+        spawnSpriteBurst(this, GW / 2 + (Math.random() - 0.5) * 300, GH / 2, 'star', {
+          count: 10,
+          speed: 240,
+          duration: 800,
+          depth: 80,
+          angleMin: -180,
+          angleMax: 0,
+          scaleMin: 0.7,
+          scaleMax: 1.2,
+          scrollFactor: 0,
+          tints: [0xFFFF44, 0x88FF44, 0xFF8844, 0x44FFFF],
+        });
       });
     }
 
@@ -542,16 +544,15 @@ export default class GameScene extends Phaser.Scene {
       onComplete: () => this.seed?.destroy(),
     });
 
-    const seedFx = this.add.particles(this.seed.x, this.seed.y, 'star', {
-      speed: { min: 80, max: 200 },
-      angle: { min: 0, max: 360 },
-      scale: { start: 1.2, end: 0 },
-      lifespan: 800,
-      quantity: 16,
-      maxParticles: 16,
-      tint: [0xFFFF44, 0x88FF44, 0xFFEE88],
-    }).setDepth(40);
-    this.time.delayedCall(1000, () => seedFx?.destroy?.());
+    spawnSpriteBurst(this, this.seed.x, this.seed.y, 'star', {
+      count: 16,
+      speed: 170,
+      duration: 800,
+      depth: 40,
+      scaleMin: 0.7,
+      scaleMax: 1.2,
+      tints: [0xFFFF44, 0x88FF44, 0xFFEE88],
+    });
 
     this.cameras.main.shake(400, 0.012);
     this.showMessage('✨ ¡Encontraste la semilla sagrada! ✨', 2500);
@@ -578,7 +579,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     for (const m of this.machines) {
-      if (!m.dead) m.update(time, delta, this.palito.x, this.palito.y);
+      if (this.isMachineAlive(m)) m.update(time, delta, this.palito.x, this.palito.y);
     }
 
     for (const a of this.animals) a.update(delta);

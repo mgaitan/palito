@@ -24,12 +24,14 @@ const config = {
     autoCenter: Phaser.Scale.CENTER_BOTH,
     width: 800,
     height: 450,
+    zoom: 1,
   },
   render: {
     antialias: true,
     antialiasGL: true,
     pixelArt: false,
-    resolution: window.devicePixelRatio || 1,
+    roundPixels: true,
+    resolution: Math.min(window.devicePixelRatio || 1, 2),
   },
 };
 

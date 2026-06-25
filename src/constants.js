@@ -101,28 +101,23 @@ export const LEVELS = [
     bgIdx: 1,
     worldW: 3200,
     platforms: [
-      { x: 0,    y: 400, w: 400,  h: 50 },  // start ground
-      { x: 500,  y: 380, w: 200,  h: 20 },  // gap!
-      { x: 750,  y: 350, w: 150,  h: 18 },
-      { x: 960,  y: 380, w: 250,  h: 20 },
+      { x: 0,    y: 400, w: 460,  h: 50 },  // start ground
+      { x: 520,  y: 380, w: 260,  h: 20 },  // first landing, no machine
+      { x: 840,  y: 350, w: 170,  h: 18 },
+      { x: 1060, y: 380, w: 360,  h: 20 },
       { x: 1100, y: 300, w: 130,  h: 18 },
-      { x: 1290, y: 370, w: 200,  h: 20 },
+      { x: 1500, y: 370, w: 300,  h: 20 },
       { x: 1290, y: 250, w: 100,  h: 18 },
-      { x: 1540, y: 380, w: 180,  h: 20 },
-      { x: 1780, y: 340, w: 200,  h: 18 },
-      { x: 2000, y: 380, w: 160,  h: 20 },
+      { x: 1860, y: 340, w: 240,  h: 18 },
+      { x: 2180, y: 380, w: 260,  h: 20 },
       { x: 2000, y: 270, w: 120,  h: 18 },
-      { x: 2220, y: 360, w: 220,  h: 18 },
-      { x: 2500, y: 380, w: 180,  h: 20 },
-      { x: 2740, y: 350, w: 200,  h: 18 },
-      { x: 2990, y: 380, w: 210,  h: 20 },
+      { x: 2520, y: 360, w: 260,  h: 18 },
+      { x: 2860, y: 380, w: 340,  h: 20 },
     ],
     machines: [
-      { type: 'bulldozer', x: 640,  y: 360 },
-      { type: 'excavator', x: 1050, y: 370 },
-      { type: 'bulldozer', x: 1420, y: 370 },
-      { type: 'excavator', x: 1870, y: 370 },
-      { type: 'bulldozer', x: 2350, y: 370 },
+      { type: 'excavator', x: 1280, y: 370 },
+      { type: 'bulldozer', x: 1700, y: 360 },
+      { type: 'excavator', x: 2320, y: 370 },
     ],
     plants: [
       { type: 'quebracho', x: 150,  y: 390 },

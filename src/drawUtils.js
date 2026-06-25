@@ -285,49 +285,65 @@ export function makeBulldozer(scene) {
 
 // ─── PLANTS ───────────────────────────────────────────────────────────────────
 export function makePlants(scene) {
-  // Quebracho blanco 56×80
+  // Quebracho blanco del monte serrano: copa irregular, abierta y baja.
   for (const state of ['full', 'wilted', 'stump']) {
     const gr = g(scene);
-    // Trunk
+    const alpha = state === 'wilted' ? 0.5 : 1;
+
     gr.fillStyle(C.QUEBRACHO_T, 1);
-    gr.fillRect(22, state === 'stump' ? 58 : 40, 12, 40);
+    gr.fillRoundedRect(23, state === 'stump' ? 58 : 40, 10, 40, 3);
 
     if (state === 'stump') {
       gr.lineStyle(2, C.MACH_D, 1);
       gr.strokeRect(20, 56, 16, 24);
     } else {
-      const alpha = state === 'wilted' ? 0.5 : 1;
-      // Crown layers
+      gr.lineStyle(3, C.QUEBRACHO_T, 1);
+      gr.lineBetween(28, 48, 14, 30);
+      gr.lineBetween(28, 46, 42, 28);
+      gr.lineBetween(28, 42, 28, 18);
+
       gr.fillStyle(C.QUEBRACHO_L, alpha);
-      gr.fillTriangle(28, 2, 4, 44, 52, 44);
+      gr.fillEllipse(28, 24, 46, 32);
+      gr.fillEllipse(13, 34, 26, 24);
+      gr.fillEllipse(43, 34, 26, 24);
       gr.fillStyle(C.QUEBRACHO_L2, alpha);
-      gr.fillTriangle(28, 14, 8, 50, 48, 50);
+      gr.fillEllipse(20, 18, 24, 18);
+      gr.fillEllipse(37, 18, 24, 18);
+      gr.fillEllipse(28, 38, 34, 18);
 
       if (state === 'wilted') {
-        // droopy leaves
         gr.fillStyle(0x9B8B40, 0.7);
-        gr.fillTriangle(28, 20, 10, 52, 46, 52);
+        gr.fillEllipse(28, 34, 42, 22);
       }
     }
     gr.generateTexture(`quebracho_${state}`, 56, 80);
     gr.destroy();
   }
 
-  // Algarrobo 48×70
+  // Algarrobo: copa ancha y sombra de árbol del monte, no conífera.
   for (const state of ['full', 'wilted', 'stump']) {
     const gr = g(scene);
     gr.fillStyle(C.ALGARROBO_T, 1);
-    gr.fillRect(18, state === 'stump' ? 52 : 38, 12, 32);
+    gr.fillRoundedRect(19, state === 'stump' ? 52 : 36, 10, 34, 3);
 
     if (state !== 'stump') {
       const alpha = state === 'wilted' ? 0.5 : 1;
+      gr.lineStyle(2.5, C.ALGARROBO_T, 1);
+      gr.lineBetween(24, 42, 10, 30);
+      gr.lineBetween(24, 40, 38, 28);
+      gr.lineBetween(24, 38, 24, 18);
+
       gr.fillStyle(C.ALGARROBO_L, alpha);
-      gr.fillCircle(24, 28, 22);
-      gr.fillCircle(12, 36, 14);
-      gr.fillCircle(36, 36, 14);
+      gr.fillEllipse(24, 27, 42, 28);
+      gr.fillEllipse(10, 35, 20, 18);
+      gr.fillEllipse(38, 35, 20, 18);
+      gr.fillEllipse(24, 40, 30, 16);
+      gr.fillStyle(0x6FA83A, alpha);
+      gr.fillEllipse(17, 23, 18, 12);
+      gr.fillEllipse(34, 24, 18, 12);
       if (state === 'wilted') {
         gr.fillStyle(0x9B8840, 0.6);
-        gr.fillCircle(24, 32, 18);
+        gr.fillEllipse(24, 34, 34, 18);
       }
     } else {
       gr.lineStyle(2, C.MACH_D, 1);

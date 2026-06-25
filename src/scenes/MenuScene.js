@@ -76,25 +76,25 @@ export default class MenuScene extends Phaser.Scene {
 
   drawTitle() {
     // Shadow
-    this.add.text(GW / 2 + 3, 78, '🌿 EL MONTE DE PALITO 🌿', {
-      fontSize: '34px',
-      fontFamily: "'Fredoka One', 'Comic Sans MS', cursive",
+    this.add.text(GW / 2 + 3, 70, 'EL MONTE DE PALITO', {
+      fontSize: '44px',
+      fontFamily: "'Bangers', 'Fredoka', 'Comic Sans MS', cursive",
       fill: '#1A4A0A',
     }).setOrigin(0.5).setAlpha(0.5);
 
     // Main title
-    const title = this.add.text(GW / 2, 76, '🌿 EL MONTE DE PALITO 🌿', {
-      fontSize: '34px',
-      fontFamily: "'Fredoka One', 'Comic Sans MS', cursive",
+    const title = this.add.text(GW / 2, 68, 'EL MONTE DE PALITO', {
+      fontSize: '44px',
+      fontFamily: "'Bangers', 'Fredoka', 'Comic Sans MS', cursive",
       fill: '#4E8A2A',
       stroke: '#FFFFFF',
       strokeThickness: 3,
     }).setOrigin(0.5).setDepth(5);
 
     // Subtitle
-    this.add.text(GW / 2, 118, '¡Defendé el monte cordobés de las máquinas!', {
-      fontSize: '14px',
-      fontFamily: "'Fredoka One', 'Comic Sans MS', cursive",
+    this.add.text(GW / 2, 112, 'Defende el monte cordobes paravachasca', {
+      fontSize: '18px',
+      fontFamily: "'Bangers', 'Fredoka', 'Comic Sans MS', cursive",
       fill: '#2D5016',
       stroke: '#FFFFFF',
       strokeThickness: 2,
@@ -122,7 +122,7 @@ export default class MenuScene extends Phaser.Scene {
 
     const playText = this.add.text(GW / 2, 182, '▶  JUGAR', {
       fontSize: '26px',
-      fontFamily: "'Fredoka One', 'Comic Sans MS', cursive",
+      fontFamily: "'Bangers', 'Fredoka', 'Comic Sans MS', cursive",
       fill: '#FFFFFF',
       stroke: '#1A5A0A',
       strokeThickness: 2,
@@ -158,14 +158,22 @@ export default class MenuScene extends Phaser.Scene {
     // Controls hint
     this.add.text(GW / 2, 224, '⬅ ➡ moverse  |  ↑ saltar  |  Z atacar', {
       fontSize: '12px',
-      fontFamily: "'Fredoka', 'Courier New', monospace",
+      fontFamily: "'Fredoka', 'Comic Sans MS', cursive",
       fill: '#2D5016',
     }).setOrigin(0.5).setDepth(5);
 
     // School info
-    this.add.text(GW / 2, 256, '🏫 Esc. D.F. Sarmiento · Villa Los Aromos · 5ºB Grupo 4', {
-      fontSize: '11px',
-      fontFamily: "'Fredoka', 'Courier New', monospace",
+    this.add.text(GW / 2, 252, 'feria de ciencias 2026', {
+      fontSize: '17px',
+      fontFamily: "'Bangers', 'Fredoka', 'Comic Sans MS', cursive",
+      fill: '#234A16',
+      stroke: '#FFFFFF',
+      strokeThickness: 2,
+    }).setOrigin(0.5).setDepth(5);
+
+    this.add.text(GW / 2, 273, 'Escuela Domingo F. Sarmiento - Los Aromos - Cordoba', {
+      fontSize: '12px',
+      fontFamily: "'Fredoka', 'Comic Sans MS', cursive",
       fill: '#3D6020',
     }).setOrigin(0.5).setDepth(5);
   }
@@ -177,22 +185,22 @@ export default class MenuScene extends Phaser.Scene {
     box.lineStyle(2, 0x4E8A2A, 1);
     box.strokeRoundedRect(GW / 2 - 220, 278, 440, 100, 8);
 
-    this.add.text(GW / 2, 292, '🌳 Grupo 4 presenta:', {
-      fontSize: '13px', fontFamily: "'Fredoka One', 'Comic Sans MS', cursive", fill: '#88DD44',
+    this.add.text(GW / 2, 292, 'Grupo 4 presenta:', {
+      fontSize: '15px', fontFamily: "'Bangers', 'Fredoka', 'Comic Sans MS', cursive", fill: '#88DD44',
     }).setOrigin(0.5).setDepth(5);
 
     this.add.text(GW / 2, 314, 'Rodri · Ciro · Alex · Mauri · Ema', {
-      fontSize: '16px', fontFamily: "'Fredoka One', 'Comic Sans MS', cursive", fill: '#CCFF88',
+      fontSize: '16px', fontFamily: "'Fredoka', 'Comic Sans MS', cursive", fill: '#CCFF88',
       stroke: '#1A3A0A', strokeThickness: 2,
     }).setOrigin(0.5).setDepth(5);
 
     this.add.text(GW / 2, 342, '"El desmonte del monte cordobés"', {
-      fontSize: '12px', fontFamily: "'Fredoka', 'Courier New', monospace", fill: '#88AA44',
+      fontSize: '12px', fontFamily: "'Fredoka', 'Comic Sans MS', cursive", fill: '#88AA44',
       fontStyle: 'italic',
     }).setOrigin(0.5).setDepth(5);
 
-    this.add.text(GW / 2, 362, 'Feria de Ciencias 2025 · Problemas ambientales', {
-      fontSize: '10px', fontFamily: "'Fredoka', 'Courier New', monospace", fill: '#557733',
+    this.add.text(GW / 2, 362, 'Feria de Ciencias 2026 - Problemas ambientales', {
+      fontSize: '10px', fontFamily: "'Fredoka', 'Comic Sans MS', cursive", fill: '#557733',
     }).setOrigin(0.5).setDepth(5);
   }
 

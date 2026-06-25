@@ -6,6 +6,7 @@ import {
   ATTACK_MS,
   ATTACK_COOLDOWN,
 } from '../constants.js';
+import { spawnSpriteBurst } from '../effects.js';
 
 export default class Palito extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y) {
@@ -121,20 +122,16 @@ export default class Palito extends Phaser.Physics.Arcade.Sprite {
     this.play('palito_attack', true);
     this.hitbox.body.setEnable(true);
 
-    // Swing effect: brief particle burst
     const dir = this.facing === 'right' ? 1 : -1;
-    const swingFx = this.scene.add.particles(
-      this.x + dir * 40, this.y - 10, 'star',
-      {
-        speed: { min: 50, max: 120 },
-        angle: { min: this.facing === 'right' ? -60 : 120, max: this.facing === 'right' ? 60 : 240 },
-        scale: { start: 0.8, end: 0 },
-        lifespan: 250,
-        quantity: 4,
-        maxParticles: 4,
-      }
-    );
-    this.scene.time.delayedCall(320, () => swingFx?.destroy?.());
+    spawnSpriteBurst(this.scene, this.x + dir * 40, this.y - 10, 'star', {
+      count: 4,
+      speed: 90,
+      duration: 250,
+      angleMin: this.facing === 'right' ? -60 : 120,
+      angleMax: this.facing === 'right' ? 60 : 240,
+      scaleMin: 0.45,
+      scaleMax: 0.8,
+    });
 
     this.scene.time.delayedCall(ATTACK_MS, () => {
       this.isAttacking = false;

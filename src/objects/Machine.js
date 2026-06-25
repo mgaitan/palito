@@ -146,17 +146,7 @@ export default class Machine extends Phaser.Physics.Arcade.Sprite {
     this.play(`${this.machineType}_hit`, true);
     this.setTint(0xFF6666);
 
-    // Emit smoke particles (one-shot burst: maxParticles = quantity)
-    const smoke = this.scene.add.particles(this.x, this.y - 20, 'dust', {
-      speed: { min: 40, max: 100 },
-      angle: { min: -120, max: -60 },
-      scale: { start: 0.8, end: 0 },
-      lifespan: 380,
-      quantity: 6,
-      maxParticles: 6,
-      tint: [0xFF8800, 0xFF4400, 0x888888],
-    }).setDepth(30);
-    this.scene.time.delayedCall(450, () => smoke?.destroy?.());
+    this.spawnBurst(this.x, this.y - 20, 6, 70, [0xFF8800, 0xFF4400, 0x888888], 380);
 
     // Numbers: show damage
     const dmgText = this.scene.add.text(this.x, this.y - 40, `-${damage}`, {
@@ -182,32 +172,26 @@ export default class Machine extends Phaser.Physics.Arcade.Sprite {
   }
 
   explode() {
+    if (this.dead) return;
     this.dead = true;
     this.setVelocityX(0);
     if (this.body) this.body.setEnable(false); // stop overlap callbacks immediately
-    this.healthBar.destroy();
+    this.healthBar?.destroy();
     this.healthBar = null;
 
-    // Big explosion - 3 bursts, each one-shot (maxParticles = quantity)
+    // Big explosion - sprite bursts avoid Phaser particle emitter stalls.
     for (let i = 0; i < 3; i++) {
       const px = this.x, py = this.y;
       this.scene.time.delayedCall(i * 150, () => {
-        if (!this.scene?.add) return;
-        const blast = this.scene.add.particles(
+        if (!this.scene?.add || !this.active) return;
+        this.spawnBurst(
           px + (Math.random() - 0.5) * 50,
           py - 15 + (Math.random() - 0.5) * 25,
-          'dust',
-          {
-            speed: { min: 60, max: 160 },
-            angle: { min: 0, max: 360 },
-            scale: { start: 1.0, end: 0 },
-            lifespan: 550,
-            quantity: 10,
-            maxParticles: 10,
-            tint: [0xFF8800, 0xFF4400, 0xFFCC00, 0x888888],
-          }
-        ).setDepth(30);
-        this.scene?.time?.delayedCall(700, () => blast?.destroy?.());
+          12,
+          150,
+          [0xFF8800, 0xFF4400, 0xFFCC00, 0x888888],
+          560
+        );
       });
     }
 
@@ -243,6 +227,32 @@ export default class Machine extends Phaser.Physics.Arcade.Sprite {
     });
   }
 
+  spawnBurst(x, y, count, speed, tints, duration) {
+    if (!this.scene?.add || !this.scene?.tweens) return;
+
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const distance = speed * (0.35 + Math.random() * 0.65);
+      const puff = this.scene.add.image(x, y, 'dust')
+        .setDepth(30)
+        .setScale(0.7 + Math.random() * 0.45)
+        .setTint(tints[Math.floor(Math.random() * tints.length)])
+        .setAlpha(0.95);
+
+      this.scene.tweens.add({
+        targets: puff,
+        x: x + Math.cos(angle) * distance,
+        y: y + Math.sin(angle) * distance - 12,
+        scaleX: 0,
+        scaleY: 0,
+        alpha: 0,
+        duration,
+        ease: 'Quad.easeOut',
+        onComplete: () => puff.destroy(),
+      });
+    }
+  }
+
   updateHealthBar() {
     if (!this.healthBar) return;
     this.healthBar.clear();
@@ -267,8 +277,8 @@ export default class Machine extends Phaser.Physics.Arcade.Sprite {
     this.healthBar.strokeRoundedRect(bx, by, bw, bh, 2);
   }
 
-  destroy() {
+  destroy(fromScene) {
     if (this.healthBar) this.healthBar.destroy();
-    super.destroy();
+    super.destroy(fromScene);
   }
 }

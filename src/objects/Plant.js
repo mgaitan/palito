@@ -1,3 +1,5 @@
+import { spawnSpriteBurst } from '../effects.js';
+
 const PLANT_CONFIGS = {
   quebracho: { states: ['full', 'wilted', 'stump'], originY: 1, scale: 1.0 },
   algarrobo: { states: ['full', 'wilted', 'stump'], originY: 1, scale: 1.0 },
@@ -95,17 +97,16 @@ export default class Plant extends Phaser.GameObjects.Sprite {
             ease: 'Sine.easeInOut',
           });
 
-          // Sparkle effect (one-shot burst)
-          const sparkle = this.scene.add.particles(this.x, this.y - 30, 'star', {
-            speed: { min: 30, max: 80 },
-            angle: { min: -180, max: 0 },
-            scale: { start: 0.8, end: 0 },
-            lifespan: 600,
-            quantity: 5,
-            maxParticles: 5,
-            tint: [0x88FF44, 0xFFFF44, 0x44FF88],
-          }).setDepth(30);
-          this.scene.time.delayedCall(750, () => sparkle?.destroy?.());
+          spawnSpriteBurst(this.scene, this.x, this.y - 30, 'star', {
+            count: 5,
+            speed: 70,
+            duration: 600,
+            angleMin: -180,
+            angleMax: 0,
+            scaleMin: 0.4,
+            scaleMax: 0.8,
+            tints: [0x88FF44, 0xFFFF44, 0x44FF88],
+          });
         },
       });
     });
