@@ -603,6 +603,31 @@ export function makeUI(scene) {
   he.generateTexture('heart_empty', 20, 20);
   he.destroy();
 
+  // Half heart
+  const hh = g(scene);
+  hh.fillStyle(C.HEART, 1);
+  hh.fillCircle(6, 6, 6);
+  hh.fillTriangle(0, 8, 10, 8, 10, 18);
+  hh.lineStyle(2, C.HEART_E, 1);
+  hh.strokeCircle(6, 6, 6);
+  hh.strokeCircle(14, 6, 6);
+  hh.strokeTriangle(0, 8, 20, 8, 10, 18);
+  hh.generateTexture('heart_half', 20, 20);
+  hh.destroy();
+
+  // Secret fruit
+  const fr = g(scene);
+  fr.fillStyle(0xFF4438, 1);
+  fr.fillCircle(10, 11, 7);
+  fr.fillStyle(0xFF7A5A, 1);
+  fr.fillCircle(7, 8, 2.5);
+  fr.fillStyle(0x5AA832, 1);
+  fr.fillEllipse(13, 4, 8, 4);
+  fr.lineStyle(2, 0x7A2F1E, 1);
+  fr.strokeCircle(10, 11, 7);
+  fr.generateTexture('fruit', 20, 20);
+  fr.destroy();
+
   // Seed (glowing) 24×24
   const sd = g(scene);
   sd.fillStyle(0xFFFF88, 0.3);

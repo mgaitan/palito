@@ -22,7 +22,8 @@ export default class Palito extends Phaser.Physics.Arcade.Sprite {
     this.setDepth(20);
     this.setScale(1.3);
 
-    this.health = PLAYER_HEALTH;
+    this.maxHealth = PLAYER_HEALTH * 2;
+    this.health = this.maxHealth;
     this.isAttacking = false;
     this.attackCooldown = 0;
     this.invulnerable = false;
@@ -169,9 +170,15 @@ export default class Palito extends Phaser.Physics.Arcade.Sprite {
     });
   }
 
-  takeDamage() {
+  heal(amount = 1) {
+    if (this.dead || this.health >= this.maxHealth) return false;
+    this.health = Math.min(this.maxHealth, this.health + amount);
+    return true;
+  }
+
+  takeDamage(amount = 2) {
     if (this.invulnerable || this.dead) return;
-    this.health--;
+    this.health -= amount;
     this.invulnerable = true;
 
     // Flash red

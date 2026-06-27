@@ -42,9 +42,11 @@ export default class GameScene extends Phaser.Scene {
 
     // ── Plants ────────────────────────────────────────────────
     this.plants = [];
+    this.fruits = this.physics.add.group();
     for (const pd of ld.plants) {
-      this.plants.push(new Plant(this, pd.x, pd.y, pd.type));
+      this.plants.push(new Plant(this, pd.x, pd.y, pd.type, { fruit: pd.fruit }));
     }
+    this.physics.add.collider(this.fruits, this.platforms);
 
     // ── Animals ───────────────────────────────────────────────
     this.animals = [];
@@ -99,6 +101,24 @@ export default class GameScene extends Phaser.Scene {
       this.palito.hitbox,
       this.machineGroup,
       this.onAttackHit,
+      null,
+      this
+    );
+
+    // ── Collision: attack vs secret fruit plants ──────────────
+    this.physics.add.overlap(
+      this.palito.hitbox,
+      this.plants,
+      this.onPlantHit,
+      null,
+      this
+    );
+
+    // ── Collision: player collects fruit ──────────────────────
+    this.physics.add.overlap(
+      this.palito,
+      this.fruits,
+      this.collectFruit,
       null,
       this
     );
@@ -239,7 +259,9 @@ export default class GameScene extends Phaser.Scene {
   updateHUDHearts() {
     const hp = this.palito?.health ?? 0;
     for (let i = 0; i < this.hearts.length; i++) {
-      this.hearts[i].setTexture(i < hp ? 'heart_full' : 'heart_empty');
+      const units = hp - i * 2;
+      const texture = units >= 2 ? 'heart_full' : units === 1 ? 'heart_half' : 'heart_empty';
+      this.hearts[i].setTexture(texture);
     }
   }
 
@@ -391,6 +413,73 @@ export default class GameScene extends Phaser.Scene {
     if (!this.isMachineAlive(machine)) return;
     this.palito.takeDamage();
     this.updateHUDHearts();
+  }
+
+  onPlantHit(hitbox, plant) {
+    if (!plant?.hasFruit || plant.fruitDropped || plant.state !== 'full') return;
+
+    plant.fruitDropped = true;
+    const fruit = this.fruits.create(plant.x, plant.y - plant.displayHeight * 0.78, 'fruit');
+    fruit.setDepth(23);
+    fruit.setBounce(0.35);
+    fruit.setDragX(90);
+    fruit.setVelocity(
+      Phaser.Math.Between(-55, 55),
+      Phaser.Math.Between(-230, -170)
+    );
+    fruit.body.setSize(14, 14);
+    fruit.body.setOffset(3, 3);
+
+    this.tweens.add({
+      targets: fruit,
+      angle: { from: -18, to: 18 },
+      duration: 650,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut',
+    });
+
+    spawnSpriteBurst(this, plant.x, plant.y - plant.displayHeight * 0.65, 'star', {
+      count: 4,
+      speed: 65,
+      duration: 420,
+      scaleMin: 0.35,
+      scaleMax: 0.65,
+      tints: [0xFF5555, 0xFFCC44, 0x88DD44],
+    });
+  }
+
+  collectFruit(player, fruit) {
+    if (!this.palito.heal(1)) return;
+
+    fruit.disableBody(true, true);
+    this.updateHUDHearts();
+    spawnSpriteBurst(this, fruit.x, fruit.y, 'star', {
+      count: 7,
+      speed: 95,
+      duration: 520,
+      depth: 35,
+      scaleMin: 0.45,
+      scaleMax: 0.8,
+      tints: [0xFF4444, 0xFFFF88, 0x88FF66],
+    });
+
+    const txt = this.add.text(fruit.x, fruit.y - 20, '+1/2', {
+      fontSize: '15px',
+      fontFamily: FONT,
+      fill: '#FFFF88',
+      stroke: '#4E120A',
+      strokeThickness: 3,
+    }).setOrigin(0.5).setDepth(60);
+
+    this.tweens.add({
+      targets: txt,
+      y: txt.y - 28,
+      alpha: 0,
+      duration: 700,
+      ease: 'Sine.easeOut',
+      onComplete: () => txt.destroy(),
+    });
   }
 
   // ── Plant / animal effects after machine dies ──────────────────────────────

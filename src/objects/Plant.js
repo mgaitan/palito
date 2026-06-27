@@ -8,12 +8,14 @@ const PLANT_CONFIGS = {
 };
 
 export default class Plant extends Phaser.GameObjects.Sprite {
-  constructor(scene, x, y, type) {
+  constructor(scene, x, y, type, options = {}) {
     const cfg = PLANT_CONFIGS[type];
     super(scene, x, y, `${type}_full`);
     scene.add.existing(this);
 
     this.plantType = type;
+    this.hasFruit = Boolean(options.fruit);
+    this.fruitDropped = false;
     this.cfg = cfg;
     this.state = 'full';
     this.setOrigin(0.5, cfg.originY);
@@ -23,6 +25,11 @@ export default class Plant extends Phaser.GameObjects.Sprite {
     // Slight random scale variation
     const variation = 0.85 + Math.random() * 0.3;
     this.setScale(cfg.scale * variation);
+
+    scene.physics.add.existing(this, true);
+    this.body.setSize(this.width, this.height);
+    this.body.setOffset(0, 0);
+    this.body.updateFromGameObject();
 
     // Gentle sway tween
     this.swayTween = scene.tweens.add({
