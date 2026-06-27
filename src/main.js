@@ -4,13 +4,17 @@ import MenuScene from './scenes/MenuScene.js';
 import IntroScene from './scenes/IntroScene.js';
 import GameScene from './scenes/GameScene.js';
 import WinScene from './scenes/WinScene.js';
+import { GW, GH } from './constants.js';
 
 const config = {
   type: Phaser.AUTO,
-  width: 800,
-  height: 450,
-  parent: document.body,
+  width: GW,
+  height: GH,
+  parent: 'game',
   backgroundColor: '#1A2A1A',
+  input: {
+    activePointers: 4,
+  },
   physics: {
     default: 'arcade',
     arcade: {
@@ -22,9 +26,10 @@ const config = {
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
-    width: 800,
-    height: 450,
-    zoom: 1,
+    width: GW,
+    height: GH,
+    expandParent: true,
+    fullscreenTarget: 'game',
   },
   render: {
     antialias: true,
@@ -35,4 +40,26 @@ const config = {
   },
 };
 
-new Phaser.Game(config);
+const game = new Phaser.Game(config);
+
+function requestImmersiveMode() {
+  const target = document.getElementById('game');
+  if (!target) return;
+
+  if (!document.fullscreenElement && target.requestFullscreen) {
+    target.requestFullscreen().catch(() => {});
+  }
+
+  if (screen.orientation?.lock) {
+    screen.orientation.lock('landscape').catch(() => {});
+  }
+
+  game.scale.refresh();
+}
+
+const isTouchDevice = navigator.maxTouchPoints > 0 || 'ontouchstart' in window;
+if (isTouchDevice) {
+  window.addEventListener('pointerdown', requestImmersiveMode, { once: true, passive: true });
+  window.addEventListener('resize', () => game.scale.refresh());
+  window.visualViewport?.addEventListener('resize', () => game.scale.refresh());
+}

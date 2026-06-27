@@ -7,10 +7,18 @@ import {
   makeUI,
   makeBackground,
 } from '../drawUtils.js';
+import { SKIN_COUNT } from '../constants.js';
 
 export default class BootScene extends Phaser.Scene {
   constructor() {
     super('BootScene');
+  }
+
+  preload() {
+    for (let i = 0; i < SKIN_COUNT; i++) {
+      const id = String(i).padStart(2, '0');
+      this.load.image(`skin_${id}`, `/assets/skins/skin_${id}.png`);
+    }
   }
 
   create() {

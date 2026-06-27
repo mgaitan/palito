@@ -7,6 +7,32 @@ export const PLAYER_HEALTH = 3;
 export const INVULN_MS = 1400;
 export const ATTACK_MS = 320;
 export const ATTACK_COOLDOWN = 550;
+export const SKIN_COUNT = 18;
+export const SKIN_STORAGE_KEY = 'montePalitoSkin';
+export const SKINS = Array.from({ length: SKIN_COUNT }, (_, id) => ({
+  id,
+  name: `Skin ${id}`,
+  enabled: true,
+}));
+
+SKINS[0].name = 'Martu';
+SKINS[1].name = 'Luz';
+SKINS[2].enabled = false;
+SKINS[3].enabled = false;
+SKINS[4].name = 'Wara';
+SKINS[5].name = 'Mauri';
+SKINS[6].name = 'Ema M.';
+SKINS[7].name = 'Anto';
+SKINS[8].name = 'Thiago';
+SKINS[9].name = 'Alex';
+SKINS[10].name = 'Rena';
+SKINS[11].name = 'Ema G. L.';
+SKINS[12].name = 'Oliver';
+SKINS[13].name = 'Gael';
+SKINS[14].name = 'Leon';
+SKINS[15].name = 'Rodri';
+SKINS[16].name = 'Lucio';
+SKINS[17].name = 'Bauti';
 
 // Palette
 export const C = {
@@ -101,49 +127,48 @@ export const LEVELS = [
     bgIdx: 1,
     worldW: 3200,
     platforms: [
-      { x: 0,    y: 400, w: 460,  h: 50 },  // start ground
-      { x: 520,  y: 380, w: 260,  h: 20 },  // first landing, no machine
-      { x: 840,  y: 350, w: 170,  h: 18 },
-      { x: 1060, y: 380, w: 360,  h: 20 },
-      { x: 1100, y: 300, w: 130,  h: 18 },
-      { x: 1500, y: 370, w: 300,  h: 20 },
-      { x: 1290, y: 250, w: 100,  h: 18 },
-      { x: 1860, y: 340, w: 240,  h: 18 },
-      { x: 2180, y: 380, w: 260,  h: 20 },
-      { x: 2000, y: 270, w: 120,  h: 18 },
-      { x: 2520, y: 360, w: 260,  h: 18 },
+      { x: 0,    y: 400, w: 520,  h: 50 },  // start ground
+      { x: 560,  y: 385, w: 300,  h: 20 },  // first landing, no machine
+      { x: 900,  y: 360, w: 210,  h: 18 },
+      { x: 1160, y: 385, w: 400,  h: 20 },
+      { x: 1180, y: 305, w: 160,  h: 18 },
+      { x: 1620, y: 375, w: 340,  h: 20 },
+      { x: 1420, y: 260, w: 130,  h: 18 },
+      { x: 2040, y: 350, w: 260,  h: 18 },
+      { x: 2380, y: 385, w: 300,  h: 20 },
+      { x: 2200, y: 285, w: 150,  h: 18 },
+      { x: 2740, y: 365, w: 280,  h: 18 },
       { x: 2860, y: 380, w: 340,  h: 20 },
     ],
     machines: [
-      { type: 'bulldozer', x: 940,  y: 340 },
-      { type: 'excavator', x: 1280, y: 370 },
-      { type: 'bulldozer', x: 1700, y: 360 },
-      { type: 'excavator', x: 1980, y: 330 },
-      { type: 'excavator', x: 2320, y: 370 },
+      { type: 'bulldozer', x: 1000, y: 350 },
+      { type: 'excavator', x: 1360, y: 375 },
+      { type: 'bulldozer', x: 1780, y: 365 },
+      { type: 'excavator', x: 2520, y: 375 },
     ],
     plants: [
       { type: 'quebracho', x: 150,  y: 390 },
       { type: 'algarrobo', x: 280,  y: 390 },
-      { type: 'quebracho', x: 580,  y: 370 },
-      { type: 'jarilla',   x: 800,  y: 345 },
-      { type: 'quebracho', x: 1010, y: 375 },
-      { type: 'cactus',    x: 1150, y: 295 },
-      { type: 'algarrobo', x: 1350, y: 365 },
-      { type: 'quebracho', x: 1620, y: 375 },
-      { type: 'jarilla',   x: 1850, y: 365 },
-      { type: 'quebracho', x: 2050, y: 375 },
-      { type: 'algarrobo', x: 2280, y: 355 },
+      { type: 'quebracho', x: 620,  y: 375 },
+      { type: 'jarilla',   x: 820,  y: 375 },
+      { type: 'quebracho', x: 1060, y: 350 },
+      { type: 'cactus',    x: 1250, y: 300 },
+      { type: 'algarrobo', x: 1440, y: 375 },
+      { type: 'quebracho', x: 1700, y: 365 },
+      { type: 'jarilla',   x: 1900, y: 365 },
+      { type: 'quebracho', x: 2120, y: 340 },
+      { type: 'algarrobo', x: 2280, y: 280 },
       { type: 'quebracho', x: 2560, y: 375 },
-      { type: 'cactus',    x: 2800, y: 345 },
+      { type: 'cactus',    x: 2820, y: 360 },
       { type: 'quebracho', x: 3050, y: 375 },
     ],
     animals: [
       { type: 'fox',      x: 200,  y: 390 },
-      { type: 'bird',     x: 750,  y: 300 },
-      { type: 'vizcacha', x: 1100, y: 300 },
-      { type: 'lizard',   x: 1620, y: 375 },
+      { type: 'bird',     x: 760,  y: 300 },
+      { type: 'vizcacha', x: 1240, y: 300 },
+      { type: 'lizard',   x: 1720, y: 365 },
       { type: 'bird',     x: 2100, y: 280 },
-      { type: 'fox',      x: 2800, y: 350 },
+      { type: 'fox',      x: 2820, y: 360 },
     ],
   },
   {
@@ -168,6 +193,8 @@ export const LEVELS = [
       { type: 'excavator', x: 500,  y: 370 },
       { type: 'bulldozer', x: 950,  y: 370 },
       { type: 'excavator', x: 1350, y: 370 },
+      { type: 'bulldozer', x: 1660, y: 290 },
+      { type: 'excavator', x: 2040, y: 170 },
     ],
     plants: [
       { type: 'quebracho', x: 120,  y: 390 },

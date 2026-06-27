@@ -5,6 +5,8 @@ import {
   INVULN_MS,
   ATTACK_MS,
   ATTACK_COOLDOWN,
+  SKINS,
+  SKIN_STORAGE_KEY,
 } from '../constants.js';
 import { spawnSpriteBurst } from '../effects.js';
 
@@ -26,12 +28,25 @@ export default class Palito extends Phaser.Physics.Arcade.Sprite {
     this.invulnerable = false;
     this.facing = 'right';
     this.dead = false;
+    this.face = this.createFaceSkin();
 
     // Attack hitbox (invisible rectangle)
     this.hitbox = scene.add.rectangle(0, 0, 48, 28, 0xFF0000, 0);
     scene.physics.add.existing(this.hitbox, false);
     this.hitbox.body.allowGravity = false;
     this.hitbox.body.setEnable(false);
+  }
+
+  createFaceSkin() {
+    const skinIndex = Number.parseInt(localStorage.getItem(SKIN_STORAGE_KEY) ?? '-1', 10);
+    if (!SKINS.some(skin => skin.id === skinIndex && skin.enabled)) return null;
+
+    const key = `skin_${String(skinIndex).padStart(2, '0')}`;
+    if (!this.scene.textures.exists(key)) return null;
+
+    return this.scene.add.image(this.x, this.y - 25, key)
+      .setDepth(this.depth + 1)
+      .setScale(0.18);
   }
 
   setupKeys() {
@@ -114,6 +129,14 @@ export default class Palito extends Phaser.Physics.Arcade.Sprite {
     const dir = this.facing === 'right' ? 1 : -1;
     this.hitbox.x = this.x + dir * 36;
     this.hitbox.y = this.y - 4;
+    this.updateFaceSkin();
+  }
+
+  updateFaceSkin() {
+    if (!this.face) return;
+    this.face.setPosition(this.x, this.y - 25);
+    this.face.setAlpha(this.alpha);
+    this.face.setVisible(this.visible);
   }
 
   triggerAttack() {
@@ -146,6 +169,7 @@ export default class Palito extends Phaser.Physics.Arcade.Sprite {
 
     // Flash red
     this.setTint(0xFF4444);
+    this.face?.setTint(0xFFAAAA);
     // Knockback
     const dir = this.facing === 'right' ? -1 : 1;
     this.setVelocityX(dir * 250);
@@ -164,6 +188,7 @@ export default class Palito extends Phaser.Physics.Arcade.Sprite {
     this.scene.time.delayedCall(INVULN_MS, () => {
       this.invulnerable = false;
       this.clearTint();
+      this.face?.clearTint();
     });
 
     if (this.health <= 0) {
@@ -175,6 +200,7 @@ export default class Palito extends Phaser.Physics.Arcade.Sprite {
     this.dead = true;
     this.hitbox.body.setEnable(false);
     this.setTint(0x888888);
+    this.face?.setTint(0x888888);
     this.setVelocityX(0);
     this.setVelocityY(-300);
     this.scene.time.delayedCall(1200, () => {
@@ -184,6 +210,7 @@ export default class Palito extends Phaser.Physics.Arcade.Sprite {
 
   destroy() {
     if (this.hitbox) this.hitbox.destroy();
+    if (this.face) this.face.destroy();
     super.destroy();
   }
 }

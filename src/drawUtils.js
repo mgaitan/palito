@@ -526,39 +526,56 @@ export function makeAnimals(scene) {
     gr.destroy();
   }
 
-  // Condor 48×28 - majestic!
+  // Condor 84x44 - wide wings, white collar, dark body.
   for (const pose of ['glide1', 'glide2']) {
     const gr = g(scene);
-    // Body
-    gr.fillStyle(0x111111, 1);
-    gr.fillEllipse(24, 16, 24, 14);
-    // White collar
-    gr.fillStyle(0xEEEEEE, 1);
-    gr.fillEllipse(24, 10, 12, 8);
-    // Head (red!)
-    gr.fillStyle(0xCC3322, 1);
-    gr.fillCircle(32, 8, 6);
-    gr.fillStyle(0xEE4433, 1);
-    gr.fillCircle(30, 7, 4);
-    gr.fillStyle(0xFFBB44, 1);
-    gr.fillTriangle(36, 8, 40, 7, 36, 10);
-    gr.fillStyle(C.EYE, 1);
-    gr.fillCircle(32, 7, 1.5);
-    // Wings
-    gr.fillStyle(0x222222, 1);
-    if (pose === 'glide1') {
-      gr.fillEllipse(24, 6, 48, 12);
-      // Wing tips
-      gr.fillStyle(0x333333, 1);
-      gr.fillTriangle(0, 8, 8, 4, 4, 14);
-      gr.fillTriangle(48, 8, 40, 4, 44, 14);
-    } else {
-      gr.fillEllipse(24, 20, 48, 10);
-      gr.fillStyle(0x333333, 1);
-      gr.fillTriangle(0, 18, 8, 22, 4, 14);
-      gr.fillTriangle(48, 18, 40, 22, 44, 14);
+
+    const wingY = pose === 'glide1' ? 17 : 23;
+    const tipY = pose === 'glide1' ? 9 : 31;
+
+    // Long wingspan
+    gr.fillStyle(0x151515, 1);
+    gr.fillTriangle(42, 18, 3, tipY, 17, wingY + 10);
+    gr.fillTriangle(42, 18, 81, tipY, 67, wingY + 10);
+    gr.fillStyle(0x252525, 1);
+    gr.fillEllipse(42, wingY, 70, 14);
+
+    // Fingered flight feathers
+    gr.fillStyle(0x0B0B0B, 1);
+    const featherY = pose === 'glide1' ? 13 : 27;
+    for (let i = 0; i < 5; i++) {
+      const leftX = 5 + i * 6;
+      const rightX = 79 - i * 6;
+      gr.fillTriangle(leftX, featherY, leftX + 7, wingY + 2, leftX + 3, wingY + 13);
+      gr.fillTriangle(rightX, featherY, rightX - 7, wingY + 2, rightX - 3, wingY + 13);
     }
-    gr.generateTexture(`condor_${pose}`, 48, 28);
+
+    // White wing flashes
+    gr.fillStyle(0xEDEDE4, 0.95);
+    if (pose === 'glide1') {
+      gr.fillTriangle(22, 14, 39, 15, 27, 19);
+      gr.fillTriangle(45, 15, 62, 14, 57, 19);
+    } else {
+      gr.fillTriangle(22, 22, 39, 21, 28, 25);
+      gr.fillTriangle(45, 21, 62, 22, 56, 25);
+    }
+
+    // Body, tail, collar and head
+    gr.fillStyle(0x111111, 1);
+    gr.fillEllipse(42, 24, 25, 16);
+    gr.fillTriangle(30, 28, 21, 34, 34, 32);
+    gr.fillStyle(0xF2F0E6, 1);
+    gr.fillEllipse(50, 17, 17, 10);
+    gr.fillStyle(0x2A1714, 1);
+    gr.fillCircle(58, 15, 7);
+    gr.fillStyle(0xC9422D, 1);
+    gr.fillCircle(60, 13, 4);
+    gr.fillStyle(0xE0B144, 1);
+    gr.fillTriangle(64, 15, 72, 13, 64, 18);
+    gr.fillStyle(C.EYE, 1);
+    gr.fillCircle(61, 13, 1.4);
+
+    gr.generateTexture(`condor_${pose}`, 84, 44);
     gr.destroy();
   }
 }

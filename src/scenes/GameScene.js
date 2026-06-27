@@ -286,65 +286,76 @@ export default class GameScene extends Phaser.Scene {
 
   // ── Mobile controls ────────────────────────────────────────────────────────
   addMobileControls() {
-    const depth = 60;
-    const alpha = 0.55;
-    const btnR = 32; // button radius
+    const depth = 120;
+    const alpha = 0.72;
+    const btnR = 38;
+    const bottomY = GH - 54;
 
-    // Only draw if touch is primary OR always for demo accessibility
-    const isMobile = this.sys.game.device.input.touch;
+    const makeButton = (x, y, label, color, labelColor) => {
+      const btn = this.add.circle(x, y, btnR, color, alpha)
+        .setScrollFactor(0)
+        .setDepth(depth)
+        .setInteractive({ useHandCursor: true });
+      btn._origColor = color;
 
-    // We always add them (they work with mouse too on desktop)
-    // Left button
-    const leftBtn = this.add.circle(btnR + 14, GH - btnR - 14, btnR, 0x224400, alpha)
-      .setScrollFactor(0).setDepth(depth).setInteractive();
-    this.add.text(leftBtn.x, leftBtn.y, '◀', {
-      fontSize: '22px', fill: '#AAFFAA', fontFamily: 'monospace',
-    }).setOrigin(0.5).setScrollFactor(0).setDepth(depth + 1);
+      const ring = this.add.circle(x, y, btnR, 0xFFFFFF, 0)
+        .setScrollFactor(0)
+        .setDepth(depth + 1);
+      ring.setStrokeStyle(3, 0xFFFFFF, 0.42);
 
-    // Right button
-    const rightBtn = this.add.circle(btnR * 3 + 28, GH - btnR - 14, btnR, 0x224400, alpha)
-      .setScrollFactor(0).setDepth(depth).setInteractive();
-    this.add.text(rightBtn.x, rightBtn.y, '▶', {
-      fontSize: '22px', fill: '#AAFFAA', fontFamily: 'monospace',
-    }).setOrigin(0.5).setScrollFactor(0).setDepth(depth + 1);
+      const text = this.add.text(x, y, label, {
+        fontSize: label.length > 1 ? '22px' : '28px',
+        fill: labelColor,
+        fontFamily: FONT,
+        stroke: '#071407',
+        strokeThickness: 3,
+      }).setOrigin(0.5).setScrollFactor(0).setDepth(depth + 2);
 
-    // Jump button (right side)
-    const jumpBtn = this.add.circle(GW - btnR - 14, GH - btnR * 3 - 20, btnR, 0x003366, alpha)
-      .setScrollFactor(0).setDepth(depth).setInteractive();
-    this.add.text(jumpBtn.x, jumpBtn.y, '▲', {
-      fontSize: '20px', fill: '#AACCFF', fontFamily: 'monospace',
-    }).setOrigin(0.5).setScrollFactor(0).setDepth(depth + 1);
+      return { btn, ring, text, color };
+    };
 
-    // Attack button (right side)
-    const attackBtn = this.add.circle(GW - btnR - 14, GH - btnR - 14, btnR, 0x660011, alpha)
-      .setScrollFactor(0).setDepth(depth).setInteractive();
-    this.add.text(attackBtn.x, attackBtn.y, '💥', {
-      fontSize: '22px', fontFamily: 'monospace',
-    }).setOrigin(0.5).setScrollFactor(0).setDepth(depth + 1);
+    const left = makeButton(58, bottomY, '<', 0x245C2B, '#C9FFC9');
+    const right = makeButton(150, bottomY, '>', 0x245C2B, '#C9FFC9');
+    const jump = makeButton(GW - 78, GH - 146, 'J', 0x134F90, '#D7ECFF');
+    const attack = makeButton(GW - 78, bottomY, 'Z', 0x8D1730, '#FFD4DE');
 
-    // Helper to darken on press
-    const press = (btn, color) => {
-      btn.on('pointerdown', () => btn.setFillStyle(color, 0.85));
-      btn.on('pointerup',   () => btn.setFillStyle(btn._origColor ?? color, alpha));
-      btn.on('pointerout',  () => btn.setFillStyle(btn._origColor ?? color, alpha));
+    const leftBtn = left.btn;
+    const rightBtn = right.btn;
+    const jumpBtn = jump.btn;
+    const attackBtn = attack.btn;
+
+    const press = ({ btn, ring, color }) => {
+      const release = () => {
+        btn.setFillStyle(color, alpha);
+        ring.setStrokeStyle(3, 0xFFFFFF, 0.42);
+      };
+      btn.on('pointerdown', () => {
+        btn.setFillStyle(color, 0.95);
+        ring.setStrokeStyle(4, 0xFFFFFF, 0.8);
+      });
+      btn.on('pointerup', release);
+      btn.on('pointerout', release);
+      btn.on('pointerupoutside', release);
     };
 
     // Wire up events
     leftBtn.on('pointerdown',  () => { this.mobileLeft = true; });
     leftBtn.on('pointerup',    () => { this.mobileLeft = false; });
     leftBtn.on('pointerout',   () => { this.mobileLeft = false; });
+    leftBtn.on('pointerupoutside', () => { this.mobileLeft = false; });
 
     rightBtn.on('pointerdown', () => { this.mobileRight = true; });
     rightBtn.on('pointerup',   () => { this.mobileRight = false; });
     rightBtn.on('pointerout',  () => { this.mobileRight = false; });
+    rightBtn.on('pointerupoutside', () => { this.mobileRight = false; });
 
     jumpBtn.on('pointerdown',  () => { this.palito?.mobileJump(); });
     attackBtn.on('pointerdown',() => { this.palito?.mobileAttack(); });
 
-    press(leftBtn,   0x224400);
-    press(rightBtn,  0x224400);
-    press(jumpBtn,   0x003366);
-    press(attackBtn, 0x660011);
+    press(left);
+    press(right);
+    press(jump);
+    press(attack);
 
     // Show controls hint on first level
     if (this.levelIndex === 0) {

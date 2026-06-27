@@ -1,4 +1,4 @@
-import { GW, GH, C } from '../constants.js';
+import { GW, GH, C, SKINS, SKIN_STORAGE_KEY } from '../constants.js';
 
 export default class MenuScene extends Phaser.Scene {
   constructor() {
@@ -6,6 +6,7 @@ export default class MenuScene extends Phaser.Scene {
   }
 
   create() {
+    this.selectedSkin = this.getSelectedSkin();
     this.drawBackground();
     this.drawAnimatedTrees();
     this.drawTitle();
@@ -16,6 +17,10 @@ export default class MenuScene extends Phaser.Scene {
     this.palito = this.add.sprite(80, 380, 'palito_idle')
       .setDepth(10)
       .setScale(1.4);
+    this.menuFace = this.add.image(80, 353, this.getSkinKey(this.selectedSkin))
+      .setDepth(11)
+      .setScale(0.19)
+      .setVisible(this.selectedSkin !== null);
     this.palitoDir = 1;
     this.palitoX = 80;
 
@@ -155,15 +160,51 @@ export default class MenuScene extends Phaser.Scene {
       });
     });
 
+    // SKIN button
+    const skinX = GW / 2;
+    const skinY = 228;
+    const skinBg = this.add.graphics().setDepth(5);
+    skinBg.fillStyle(0x2A6BA8, 1);
+    skinBg.fillRoundedRect(skinX - 100, skinY - 22, 200, 44, 10);
+    skinBg.lineStyle(3, 0xFFFFFF, 1);
+    skinBg.strokeRoundedRect(skinX - 100, skinY - 22, 200, 44, 10);
+
+    this.add.text(skinX, skinY, 'ELEGIR SKIN', {
+      fontSize: '22px',
+      fontFamily: "'Bangers', 'Fredoka', 'Comic Sans MS', cursive",
+      fill: '#FFFFFF',
+      stroke: '#103456',
+      strokeThickness: 2,
+    }).setOrigin(0.5).setDepth(6);
+
+    const skinZone = this.add.zone(skinX, skinY, 200, 44).setInteractive();
+    skinZone.on('pointerover', () => {
+      skinBg.clear();
+      skinBg.fillStyle(0x3D85C6, 1);
+      skinBg.fillRoundedRect(skinX - 100, skinY - 22, 200, 44, 10);
+      skinBg.lineStyle(3, 0xFFFF00, 1);
+      skinBg.strokeRoundedRect(skinX - 100, skinY - 22, 200, 44, 10);
+      this.input.setDefaultCursor('pointer');
+    });
+    skinZone.on('pointerout', () => {
+      skinBg.clear();
+      skinBg.fillStyle(0x2A6BA8, 1);
+      skinBg.fillRoundedRect(skinX - 100, skinY - 22, 200, 44, 10);
+      skinBg.lineStyle(3, 0xFFFFFF, 1);
+      skinBg.strokeRoundedRect(skinX - 100, skinY - 22, 200, 44, 10);
+      this.input.setDefaultCursor('default');
+    });
+    skinZone.on('pointerdown', () => this.openSkinSelector());
+
     // Controls hint
-    this.add.text(GW / 2, 224, '⬅ ➡ moverse  |  ↑ saltar  |  Z atacar', {
+    this.add.text(GW / 2, 268, '⬅ ➡ moverse  |  ↑ saltar  |  Z atacar', {
       fontSize: '12px',
       fontFamily: "'Fredoka', 'Comic Sans MS', cursive",
       fill: '#2D5016',
     }).setOrigin(0.5).setDepth(5);
 
     // School info
-    this.add.text(GW / 2, 252, 'feria de ciencias 2026', {
+    this.add.text(GW / 2, 292, 'feria de ciencias 2026', {
       fontSize: '17px',
       fontFamily: "'Bangers', 'Fredoka', 'Comic Sans MS', cursive",
       fill: '#234A16',
@@ -171,36 +212,128 @@ export default class MenuScene extends Phaser.Scene {
       strokeThickness: 2,
     }).setOrigin(0.5).setDepth(5);
 
-    this.add.text(GW / 2, 273, 'Escuela Domingo F. Sarmiento - Los Aromos - Cordoba', {
+    this.add.text(GW / 2, 313, 'Escuela Domingo F. Sarmiento - Los Aromos - Cordoba', {
       fontSize: '12px',
       fontFamily: "'Fredoka', 'Comic Sans MS', cursive",
       fill: '#3D6020',
     }).setOrigin(0.5).setDepth(5);
   }
 
+  getSkinKey(index) {
+    return `skin_${String(index ?? 0).padStart(2, '0')}`;
+  }
+
+  getSelectedSkin() {
+    const raw = localStorage.getItem(SKIN_STORAGE_KEY);
+    const index = Number.parseInt(raw ?? '-1', 10);
+    return SKINS.some(skin => skin.id === index && skin.enabled) ? index : null;
+  }
+
+  setSelectedSkin(index) {
+    this.selectedSkin = index;
+    localStorage.setItem(SKIN_STORAGE_KEY, String(index));
+    this.menuFace
+      ?.setTexture(this.getSkinKey(index))
+      .setVisible(true);
+  }
+
+  openSkinSelector() {
+    if (this.skinPanel) return;
+
+    const items = [];
+    const bg = this.add.graphics().setDepth(80);
+    bg.fillStyle(0x061806, 0.9);
+    bg.fillRect(0, 0, GW, GH);
+    items.push(bg);
+
+    const panel = this.add.graphics().setDepth(81);
+    panel.fillStyle(0xEAF8DE, 1);
+    panel.fillRoundedRect(116, 48, 568, 354, 10);
+    panel.lineStyle(4, 0x2D6A20, 1);
+    panel.strokeRoundedRect(116, 48, 568, 354, 10);
+    items.push(panel);
+
+    items.push(this.add.text(GW / 2, 82, 'Elegí tu cara', {
+      fontSize: '30px',
+      fontFamily: "'Bangers', 'Fredoka', 'Comic Sans MS', cursive",
+      fill: '#2D6A20',
+      stroke: '#FFFFFF',
+      strokeThickness: 3,
+    }).setOrigin(0.5).setDepth(82));
+
+    const enabledSkins = SKINS.filter(skin => skin.enabled);
+    for (let i = 0; i < enabledSkins.length; i++) {
+      const skin = enabledSkins[i];
+      const col = i % 6;
+      const row = Math.floor(i / 6);
+      const x = 182 + col * 86;
+      const y = 128 + row * 88;
+      const selected = skin.id === this.selectedSkin;
+
+      const ring = this.add.circle(x, y, 34, selected ? 0xFFDD44 : 0xFFFFFF, selected ? 0.9 : 0.35)
+        .setDepth(82);
+      ring.setStrokeStyle(selected ? 4 : 2, selected ? 0x2D6A20 : 0x89A875, 1);
+      items.push(ring);
+
+      const face = this.add.image(x, y, this.getSkinKey(skin.id))
+        .setDepth(83)
+        .setScale(0.48)
+        .setInteractive({ useHandCursor: true });
+      face.on('pointerdown', () => {
+        this.setSelectedSkin(skin.id);
+        close();
+      });
+      items.push(face);
+
+      const label = this.add.text(x, y + 45, skin.name, {
+        fontSize: '11px',
+        fontFamily: "'Fredoka', 'Comic Sans MS', cursive",
+        fill: '#244A16',
+        stroke: '#FFFFFF',
+        strokeThickness: 2,
+      }).setOrigin(0.5).setDepth(83);
+      items.push(label);
+    }
+
+    const closeBg = this.add.graphics().setDepth(82);
+    closeBg.fillStyle(0x2D6A20, 1);
+    closeBg.fillRoundedRect(GW / 2 - 78, 358, 156, 34, 8);
+    items.push(closeBg);
+
+    const closeText = this.add.text(GW / 2, 365, 'LISTO', {
+      fontSize: '20px',
+      fontFamily: "'Bangers', 'Fredoka', 'Comic Sans MS', cursive",
+      fill: '#FFFFFF',
+    }).setOrigin(0.5).setDepth(83).setPosition(GW / 2, 375);
+    items.push(closeText);
+
+    const closeZone = this.add.zone(GW / 2, 375, 156, 34).setInteractive({ useHandCursor: true });
+    items.push(closeZone);
+
+    const close = () => {
+      for (const item of items) item.destroy();
+      this.skinPanel = null;
+      this.input.setDefaultCursor('default');
+    };
+    closeZone.on('pointerdown', close);
+
+    this.skinPanel = items;
+  }
+
   drawCreditsBox() {
     const box = this.add.graphics().setDepth(4);
     box.fillStyle(0x1A3A0A, 0.75);
-    box.fillRoundedRect(GW / 2 - 220, 278, 440, 100, 8);
+    box.fillRoundedRect(GW / 2 - 220, 322, 440, 58, 8);
     box.lineStyle(2, 0x4E8A2A, 1);
-    box.strokeRoundedRect(GW / 2 - 220, 278, 440, 100, 8);
+    box.strokeRoundedRect(GW / 2 - 220, 322, 440, 58, 8);
 
-    this.add.text(GW / 2, 292, 'Grupo 4 presenta:', {
+    this.add.text(GW / 2, 336, 'Grupo 4 presenta:', {
       fontSize: '15px', fontFamily: "'Bangers', 'Fredoka', 'Comic Sans MS', cursive", fill: '#88DD44',
     }).setOrigin(0.5).setDepth(5);
 
-    this.add.text(GW / 2, 314, 'Rodri · Ciro · Alex · Mauri · Ema', {
-      fontSize: '16px', fontFamily: "'Fredoka', 'Comic Sans MS', cursive", fill: '#CCFF88',
+    this.add.text(GW / 2, 358, 'Rodri · Ciro · Alex · Mauri · Ema', {
+      fontSize: '15px', fontFamily: "'Fredoka', 'Comic Sans MS', cursive", fill: '#CCFF88',
       stroke: '#1A3A0A', strokeThickness: 2,
-    }).setOrigin(0.5).setDepth(5);
-
-    this.add.text(GW / 2, 342, '"El desmonte del monte cordobés"', {
-      fontSize: '12px', fontFamily: "'Fredoka', 'Comic Sans MS', cursive", fill: '#88AA44',
-      fontStyle: 'italic',
-    }).setOrigin(0.5).setDepth(5);
-
-    this.add.text(GW / 2, 362, 'Feria de Ciencias 2026 - Problemas ambientales', {
-      fontSize: '10px', fontFamily: "'Fredoka', 'Comic Sans MS', cursive", fill: '#557733',
     }).setOrigin(0.5).setDepth(5);
   }
 
@@ -229,5 +362,6 @@ export default class MenuScene extends Phaser.Scene {
     this.palito.x = this.palitoX;
     this.palito.setFlipX(this.palitoDir < 0);
     this.palito.play('palito_walk', true);
+    this.menuFace?.setPosition(this.palito.x, this.palito.y - 27);
   }
 }
