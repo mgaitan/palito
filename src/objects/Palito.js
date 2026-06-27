@@ -28,6 +28,7 @@ export default class Palito extends Phaser.Physics.Arcade.Sprite {
     this.invulnerable = false;
     this.facing = 'right';
     this.dead = false;
+    this.faceCover = null;
     this.face = this.createFaceSkin();
 
     // Attack hitbox (invisible rectangle)
@@ -44,9 +45,12 @@ export default class Palito extends Phaser.Physics.Arcade.Sprite {
     const key = `skin_${String(skinIndex).padStart(2, '0')}`;
     if (!this.scene.textures.exists(key)) return null;
 
+    this.faceCover = this.scene.add.circle(this.x, this.y - 25, 13, 0xFFDBA4, 1)
+      .setDepth(this.depth + 0.8);
+
     return this.scene.add.image(this.x, this.y - 25, key)
       .setDepth(this.depth + 1)
-      .setScale(0.18);
+      .setScale(0.21);
   }
 
   setupKeys() {
@@ -134,6 +138,9 @@ export default class Palito extends Phaser.Physics.Arcade.Sprite {
 
   updateFaceSkin() {
     if (!this.face) return;
+    this.faceCover?.setPosition(this.x, this.y - 25);
+    this.faceCover?.setAlpha(this.alpha);
+    this.faceCover?.setVisible(this.visible);
     this.face.setPosition(this.x, this.y - 25);
     this.face.setAlpha(this.alpha);
     this.face.setVisible(this.visible);
@@ -169,6 +176,7 @@ export default class Palito extends Phaser.Physics.Arcade.Sprite {
 
     // Flash red
     this.setTint(0xFF4444);
+    this.faceCover?.setFillStyle(0xFFAAAA, 1);
     this.face?.setTint(0xFFAAAA);
     // Knockback
     const dir = this.facing === 'right' ? -1 : 1;
@@ -188,6 +196,7 @@ export default class Palito extends Phaser.Physics.Arcade.Sprite {
     this.scene.time.delayedCall(INVULN_MS, () => {
       this.invulnerable = false;
       this.clearTint();
+      this.faceCover?.setFillStyle(0xFFDBA4, 1);
       this.face?.clearTint();
     });
 
@@ -200,6 +209,7 @@ export default class Palito extends Phaser.Physics.Arcade.Sprite {
     this.dead = true;
     this.hitbox.body.setEnable(false);
     this.setTint(0x888888);
+    this.faceCover?.setFillStyle(0x888888, 1);
     this.face?.setTint(0x888888);
     this.setVelocityX(0);
     this.setVelocityY(-300);
@@ -210,6 +220,7 @@ export default class Palito extends Phaser.Physics.Arcade.Sprite {
 
   destroy() {
     if (this.hitbox) this.hitbox.destroy();
+    if (this.faceCover) this.faceCover.destroy();
     if (this.face) this.face.destroy();
     super.destroy();
   }

@@ -1,4 +1,4 @@
-import { GW, GH, C, SKINS, SKIN_STORAGE_KEY } from '../constants.js';
+import { GW, GH, C, SKINS, SKIN_MENU_ORDER, SKIN_STORAGE_KEY } from '../constants.js';
 
 export default class MenuScene extends Phaser.Scene {
   constructor() {
@@ -248,9 +248,9 @@ export default class MenuScene extends Phaser.Scene {
 
     const panel = this.add.graphics().setDepth(81);
     panel.fillStyle(0xEAF8DE, 1);
-    panel.fillRoundedRect(116, 48, 568, 354, 10);
+    panel.fillRoundedRect(128, 42, 544, 384, 10);
     panel.lineStyle(4, 0x2D6A20, 1);
-    panel.strokeRoundedRect(116, 48, 568, 354, 10);
+    panel.strokeRoundedRect(128, 42, 544, 384, 10);
     items.push(panel);
 
     items.push(this.add.text(GW / 2, 82, 'Elegí tu cara', {
@@ -261,13 +261,15 @@ export default class MenuScene extends Phaser.Scene {
       strokeThickness: 3,
     }).setOrigin(0.5).setDepth(82));
 
-    const enabledSkins = SKINS.filter(skin => skin.enabled);
+    const enabledSkins = SKIN_MENU_ORDER
+      .map(id => SKINS[id])
+      .filter(skin => skin?.enabled);
     for (let i = 0; i < enabledSkins.length; i++) {
       const skin = enabledSkins[i];
-      const col = i % 6;
-      const row = Math.floor(i / 6);
-      const x = 182 + col * 86;
-      const y = 128 + row * 88;
+      const col = i % 4;
+      const row = Math.floor(i / 4);
+      const x = 205 + col * 130;
+      const y = 118 + row * 73;
       const selected = skin.id === this.selectedSkin;
 
       const ring = this.add.circle(x, y, 34, selected ? 0xFFDD44 : 0xFFFFFF, selected ? 0.9 : 0.35)
@@ -285,8 +287,8 @@ export default class MenuScene extends Phaser.Scene {
       });
       items.push(face);
 
-      const label = this.add.text(x, y + 45, skin.name, {
-        fontSize: '11px',
+      const label = this.add.text(x, y + 36, skin.name, {
+        fontSize: '10px',
         fontFamily: "'Fredoka', 'Comic Sans MS', cursive",
         fill: '#244A16',
         stroke: '#FFFFFF',
@@ -297,17 +299,17 @@ export default class MenuScene extends Phaser.Scene {
 
     const closeBg = this.add.graphics().setDepth(82);
     closeBg.fillStyle(0x2D6A20, 1);
-    closeBg.fillRoundedRect(GW / 2 - 78, 358, 156, 34, 8);
+    closeBg.fillRoundedRect(GW / 2 - 78, 390, 156, 28, 8);
     items.push(closeBg);
 
     const closeText = this.add.text(GW / 2, 365, 'LISTO', {
-      fontSize: '20px',
+      fontSize: '18px',
       fontFamily: "'Bangers', 'Fredoka', 'Comic Sans MS', cursive",
       fill: '#FFFFFF',
-    }).setOrigin(0.5).setDepth(83).setPosition(GW / 2, 375);
+    }).setOrigin(0.5).setDepth(83).setPosition(GW / 2, 404);
     items.push(closeText);
 
-    const closeZone = this.add.zone(GW / 2, 375, 156, 34).setInteractive({ useHandCursor: true });
+    const closeZone = this.add.zone(GW / 2, 404, 156, 28).setInteractive({ useHandCursor: true });
     items.push(closeZone);
 
     const close = () => {

@@ -14,6 +14,7 @@ export const SKINS = Array.from({ length: SKIN_COUNT }, (_, id) => ({
   name: `Skin ${id}`,
   enabled: true,
 }));
+export const SKIN_MENU_ORDER = [0, 1, 4, 5, 6, 7, 9, 10, 12, 11, 8, 13, 14, 15, 16, 17];
 
 SKINS[0].name = 'Martu';
 SKINS[1].name = 'Luz';
