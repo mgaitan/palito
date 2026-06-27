@@ -628,20 +628,40 @@ export function makeUI(scene) {
   fr.generateTexture('fruit', 20, 20);
   fr.destroy();
 
-  // Seed (glowing) 24×24
+  // Sacred seed: earthy, irregular and sprouting.
   const sd = g(scene);
-  sd.fillStyle(0xFFFF88, 0.3);
-  sd.fillCircle(12, 12, 12);
-  sd.fillStyle(C.SEED2, 1);
-  sd.fillCircle(12, 12, 8);
-  sd.fillStyle(C.SEED, 1);
-  sd.fillCircle(12, 12, 5);
-  sd.lineStyle(2, 0xAAFF44, 1);
-  sd.strokeCircle(12, 12, 8);
-  // leaf detail
-  sd.fillStyle(0xAAFF44, 1);
-  sd.fillEllipse(12, 6, 6, 4);
-  sd.generateTexture('seed', 24, 24);
+  sd.fillStyle(0xFFF2A8, 0.16);
+  sd.fillCircle(16, 17, 15);
+  sd.fillStyle(0xEBD76B, 0.18);
+  sd.fillCircle(16, 17, 11);
+
+  sd.fillStyle(0x5E3B1D, 0.32);
+  sd.fillEllipse(16, 27, 17, 5);
+
+  sd.fillStyle(0xA7652B, 1);
+  sd.fillEllipse(16, 18, 15, 19);
+  sd.fillTriangle(10, 13, 16, 4, 22, 13);
+  sd.fillStyle(0xD99A42, 1);
+  sd.fillEllipse(14, 15, 7, 12);
+  sd.fillStyle(0x7B451F, 0.75);
+  sd.fillTriangle(12, 20, 18, 27, 22, 16);
+
+  sd.lineStyle(2, 0x5E3218, 1);
+  sd.strokeEllipse(16, 18, 15, 19);
+  sd.lineStyle(1, 0xF4C65A, 0.9);
+  sd.lineBetween(12, 10, 17, 22);
+
+  sd.lineStyle(2, 0x4B8B2A, 1);
+  sd.lineBetween(16, 9, 16, 2);
+  sd.fillStyle(0x72B83D, 1);
+  sd.fillEllipse(12, 4, 9, 5);
+  sd.fillStyle(0x94D85B, 1);
+  sd.fillEllipse(20, 5, 10, 5);
+  sd.lineStyle(1, 0x3D7020, 0.8);
+  sd.lineBetween(9, 4, 15, 4);
+  sd.lineBetween(16, 5, 23, 4);
+
+  sd.generateTexture('seed', 32, 32);
   sd.destroy();
 
   // Star particle 8×8
