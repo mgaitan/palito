@@ -48,14 +48,9 @@ export default class GameScene extends Phaser.Scene {
 
     // ── Animals ───────────────────────────────────────────────
     this.animals = [];
-    this.animalGroup = this.physics.add.group();
     for (const ad of ld.animals) {
       const a = new Animal(this, ad.x, ad.y, ad.type);
       this.animals.push(a);
-      if (!a.flying) this.animalGroup.add(a);
-    }
-    if (this.animalGroup.getLength() > 0) {
-      this.physics.add.collider(this.animalGroup, this.platforms);
     }
 
     // ── Machines ──────────────────────────────────────────────

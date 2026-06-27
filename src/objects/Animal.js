@@ -69,7 +69,9 @@ export default class Animal extends Phaser.Physics.Arcade.Sprite {
 
   snapToWalkPlatform() {
     if (!this.walkPlatform) return;
+    this.x = Phaser.Math.Clamp(this.x, this.walkMinX, this.walkMaxX);
     this.y = this.walkPlatform.y - this.displayHeight / 2 + 1;
+    this.setVelocityY(0);
     this.body.updateFromGameObject?.();
   }
 
@@ -82,15 +84,24 @@ export default class Animal extends Phaser.Physics.Arcade.Sprite {
       this.setVelocityY(-80);
       this.setVelocityX(this.dir * this.speed * 3);
     } else {
-      this.setVelocityX(this.dir * this.speed * 4);
+      const targetX = this.walkPlatform
+        ? Phaser.Math.Clamp(this.x + this.dir * 48, this.walkMinX, this.walkMaxX)
+        : this.x + this.dir * 36;
+      this.setVelocityX(0);
       this.setVelocityY(0);
       this.scene.tweens.add({
         targets: this,
+        x: targetX,
         y: this.y - 16,
-        duration: 160,
+        duration: 220,
         yoyo: true,
         ease: 'Sine.easeOut',
-        onComplete: () => this.snapToWalkPlatform(),
+        onComplete: () => {
+          this.snapToWalkPlatform();
+          if (this.walkPlatform && (this.x <= this.walkMinX + 2 || this.x >= this.walkMaxX - 2)) {
+            this.dir *= -1;
+          }
+        },
       });
     }
     this.scene.time.delayedCall(2000, () => {
@@ -103,6 +114,9 @@ export default class Animal extends Phaser.Physics.Arcade.Sprite {
   returnToNormal() {
     this.scared = false;
     this.clearTint();
+    this.setVelocityX(0);
+    this.setVelocityY(0);
+    this.snapToWalkPlatform();
     // Bounce back after regrowth
     this.scene.tweens.add({
       targets: this,
@@ -142,6 +156,7 @@ export default class Animal extends Phaser.Physics.Arcade.Sprite {
       }
       this.setVelocityX(this.dir * this.speed);
       this.setVelocityY(0);
+      if (this.walkPlatform) this.x = Phaser.Math.Clamp(this.x, this.walkMinX, this.walkMaxX);
     }
 
     this.setFlipX(this.dir < 0);
