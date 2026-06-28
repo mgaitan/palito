@@ -416,7 +416,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   onPlantHit(hitbox, plant) {
-    if (!plant?.hasFruit || plant.fruitDropped || plant.state !== 'full') return;
+    if (!plant?.hasFruit || plant.fruitDropped || plant.state === 'stump') return;
 
     plant.fruitDropped = true;
     const fruit = this.fruits.create(plant.x, plant.y - plant.displayHeight * 0.78, 'fruit');
@@ -480,6 +480,18 @@ export default class GameScene extends Phaser.Scene {
       ease: 'Sine.easeOut',
       onComplete: () => txt.destroy(),
     });
+  }
+
+  checkSecretPlantHits() {
+    if (!this.palito?.isAttacking || !this.palito.hitbox?.body?.enable) return;
+
+    const hitBounds = this.palito.hitbox.getBounds();
+    for (const plant of this.plants) {
+      if (!plant?.hasFruit || plant.fruitDropped || plant.state === 'stump') continue;
+      if (Phaser.Geom.Intersects.RectangleToRectangle(hitBounds, plant.getBounds())) {
+        this.onPlantHit(this.palito.hitbox, plant);
+      }
+    }
   }
 
   // ── Plant / animal effects after machine dies ──────────────────────────────
@@ -665,6 +677,7 @@ export default class GameScene extends Phaser.Scene {
     if (this.levelComplete || this.playerDead) return;
 
     this.palito.update(time, delta, this.mobileLeft, this.mobileRight);
+    this.checkSecretPlantHits();
     this.updateHUDHearts();
 
     // Fall death
