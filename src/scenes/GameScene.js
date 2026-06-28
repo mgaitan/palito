@@ -486,9 +486,17 @@ export default class GameScene extends Phaser.Scene {
     if (!this.palito?.isAttacking || !this.palito.hitbox?.body?.enable) return;
 
     const hitBounds = this.palito.hitbox.getBounds();
+    const facingDir = this.palito.facing === 'right' ? 1 : -1;
     for (const plant of this.plants) {
       if (!plant?.hasFruit || plant.fruitDropped || plant.state === 'stump') continue;
-      if (Phaser.Geom.Intersects.RectangleToRectangle(hitBounds, plant.getBounds())) {
+
+      const dx = plant.x - this.palito.x;
+      const dy = Math.abs(plant.y - this.palito.y);
+      const inFront = Math.sign(dx) === facingDir || Math.abs(dx) < 16;
+      const nearSwing = inFront && Math.abs(dx) < 100 && dy < 95;
+      const directHit = Phaser.Geom.Intersects.RectangleToRectangle(hitBounds, plant.getBounds());
+
+      if (directHit || nearSwing) {
         this.onPlantHit(this.palito.hitbox, plant);
       }
     }
